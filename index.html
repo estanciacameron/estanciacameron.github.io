@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2E5A3C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cameron">
+<title>Ovinos Cameron</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
+<style>
+:root{--bg:#f4f3ee;--card:#fff;--line:#e5e3db;--ink:#2c2c2a;--mut:#6f6e68;--soft:#9a998f;--acc:#2E5A3C;--ok:#27500A;--bad:#a32d2d;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+body{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+#top{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;display:flex;align-items:center;gap:10px;}
+#top .ic{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:19px;}
+#top .bk{cursor:pointer;font-size:22px;display:flex;}
+#top h1{font-size:16px;font-weight:600;margin:0;line-height:1.1;}
+#top .sub{font-size:11px;opacity:.85;margin-top:1px;}
+#stage{flex:1;padding:14px;transition:opacity .18s,transform .22s;opacity:1;}
+#nav{position:sticky;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
+#nav .tb{flex:1;text-align:center;padding:9px 0 8px;cursor:pointer;color:var(--soft);transition:color .15s;}
+#nav .tb i{font-size:21px;}#nav .tb div{font-size:10px;margin-top:1px;}#nav .tb.on{color:var(--acc);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-bottom:10px;}
+.chip{font-size:11px;padding:2px 9px;border-radius:20px;white-space:nowrap;display:inline-block;}
+.row{display:flex;align-items:center;justify-content:space-between;}
+.big{font-size:23px;font-weight:600;color:var(--acc);}
+.met{background:var(--bg);border-radius:11px;padding:9px 8px;text-align:center;position:relative;}
+.met .v{font-size:18px;font-weight:600;}.met .u{font-size:11px;color:var(--mut);font-weight:400;}
+.met .l{font-size:10px;color:var(--mut);margin-top:1px;}
+.met .x{position:absolute;top:3px;right:5px;font-size:12px;color:var(--soft);cursor:pointer;display:none;}
+.met.ed .x{display:block;}
+.tl{position:relative;padding-left:20px;}
+.tl:before{content:"";position:absolute;left:5px;top:5px;bottom:5px;width:2px;background:var(--line);}
+.tl .it{position:relative;margin-bottom:13px;}
+.tl .dot{position:absolute;left:-17px;top:3px;width:11px;height:11px;border-radius:50%;border:2px solid var(--card);}
+.tl .dt{font-size:10px;color:var(--soft);}.tl .dsc{font-size:12px;color:var(--mut);margin-top:3px;}
+input,select,textarea,button{font-family:inherit;font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);width:100%;}
+button{background:var(--acc);color:#fff;border:none;font-weight:600;cursor:pointer;}
+button.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);}
+h3{font-size:12px;color:var(--mut);font-weight:600;margin:0 0 8px;}
+.sec-h{font-size:12px;color:var(--mut);margin-bottom:9px;}
+.add{color:var(--acc);cursor:pointer;font-weight:600;}
+.ph{width:100%;border-radius:11px;margin-top:8px;display:block;}
+.thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;margin-top:6px;}
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center;z-index:20;}
+.sheet{background:var(--card);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto;}
+label{font-size:12px;color:var(--mut);display:block;margin:9px 0 4px;}
+.fab{position:fixed;bottom:66px;right:calc(50% - 260px + 16px);z-index:6;}
+@media(max-width:540px){.fab{right:16px;}}
+.fab button{width:auto;border-radius:24px;padding:11px 16px;box-shadow:0 3px 10px rgba(0,0,0,.18);}
+</style>
+</head>
+<body>
+<div id="top"></div>
+<div id="stage"></div>
+<div id="fab" class="fab"></div>
+<div id="nav"></div>
+<div id="modal"></div>
+<script>
+var CAT={Ovejas:["#EAF3DE","#27500A"],Borregas:["#E1F5EE","#085041"],Capones:["#FAEEDA","#633806"],Carneros:["#EEEDFE","#3C3489"],Corderos:["#E6F1FB","#0C447C"],"Refugo/CUL":["#FCEBEB","#791F1F"]};
+var TIPO={Alta:["#EAF3DE","#27500A"],"Alta por división":["#EAF3DE","#27500A"],"Alta por destete":["#EAF3DE","#27500A"],"Alta por cambio":["#EAF3DE","#27500A"],Compra:["#EAF3DE","#27500A"],Muerte:["#FCEBEB","#791F1F"],Venta:["#FCEBEB","#791F1F"],"Salida por división":["#FCEBEB","#791F1F"],"Cambio de categoría":["#FCEBEB","#791F1F"],Dosificación:["#E6F1FB","#0C447C"],Tratamiento:["#E6F1FB","#0C447C"],Encaste:["#FBEAF0","#72243E"],"Diagnóstico de preñez":["#FBEAF0","#72243E"],Señalada:["#FBEAF0","#72243E"],Destete:["#FBEAF0","#72243E"],Esquila:["#FAEEDA","#633806"],Conteo:["#E1F5EE","#085041"],"Ajuste de conteo":["#E1F5EE","#085041"],Movimiento:["#F1EFE8","#444441"],Comentario:["#F1EFE8","#444441"]};
+var TIPOS=Object.keys(TIPO);
+var MES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+function seed(){return {rebanos:[
+ {id:"L1",cat:"Ovejas",pot:"El 1",foto:null,campos:[["Última dosificación","15/03/2026"],["Mortalidad","0,7%"],["Preñez","92,3%"],["Señalada","84,7%"],["Destete","81,6%"],["Lana","3750 kg"]],ev:[
+   {f:"2025-03-01",t:"Alta",c:820,x:"Conteo inicial",foto:null},{f:"2025-04-20",t:"Encaste",c:0,x:"815 encastadas",foto:null},{f:"2025-06-10",t:"Diagnóstico de preñez",c:0,x:"752 preñadas (ecografía)",foto:null},{f:"2025-09-20",t:"Esquila",c:0,x:"3750 kg de lana",foto:null},{f:"2025-12-15",t:"Señalada",c:0,x:"690 corderos",foto:null},{f:"2026-02-20",t:"Destete",c:0,x:"665 destetados",foto:null},{f:"2026-03-15",t:"Dosificación",c:0,x:"Vitamina ADE",foto:null},{f:"2026-05-20",t:"Muerte",c:-6,x:"Predación (zorro)",foto:null},{f:"2026-06-10",t:"Ajuste de conteo",c:-12,x:"Conteo en manga: 490",foto:null}]},
+ {id:"L2",cat:"Borregas",pot:"Faja del 1",foto:null,campos:[["Última dosificación","15/03/2026"]],ev:[{f:"2025-03-01",t:"Alta",c:310,x:"Conteo inicial",foto:null},{f:"2026-03-15",t:"Dosificación",c:0,x:"Ivermectina 1%",foto:null},{f:"2026-07-02",t:"Conteo",c:0,x:"Contadas 308",foto:null}]},
+ {id:"L3",cat:"Capones",pot:"Toros 1",foto:null,campos:[["Mortalidad","0,7%"],["Lana","2100 kg"]],ev:[{f:"2025-03-01",t:"Alta",c:460,x:"Conteo inicial",foto:null},{f:"2025-09-20",t:"Esquila",c:0,x:"2100 kg de lana",foto:null},{f:"2026-07-05",t:"Muerte",c:-3,x:"Neumonía",foto:null},{f:"2026-07-08",t:"Venta",c:-200,x:"Frigorífico",foto:null}]},
+ {id:"L4",cat:"Ovejas",pot:"Tropilla 1",foto:null,campos:[],ev:[{f:"2026-05-10",t:"Alta por división",c:300,x:"Separadas de L1",foto:null}]},
+ {id:"L5",cat:"Corderos",pot:"El 1",foto:null,campos:[["Mortalidad","1,5%"]],ev:[{f:"2026-02-20",t:"Alta por destete",c:665,x:"Destetados de L1",foto:null},{f:"2026-04-01",t:"Muerte",c:-10,x:"Frío/debilidad",foto:null}]},
+ {id:"L6",cat:"Carneros",pot:"La antena",foto:null,campos:[],ev:[{f:"2025-03-01",t:"Alta",c:22,x:"Padres Corriedale",foto:null}]},
+ {id:"L7",cat:"Refugo/CUL",pot:"Bautismo",foto:null,campos:[],ev:[{f:"2026-06-20",t:"Alta por cambio",c:40,x:"Ovejas viejas",foto:null}]}
+],faenas:[{m:1,t:"Recuento de verano",k:"Conteo"},{m:2,t:"Destete",k:"Destete"},{m:3,t:"Dosificación general",k:"Dosificación"},{m:4,t:"Encaste",k:"Encaste"},{m:5,t:"Venta de capones",k:"Venta"},{m:6,t:"Ecografía (preñez)",k:"Diagnóstico de preñez"},{m:7,t:"Antiparasitario",k:"Dosificación"},{m:9,t:"Esquila pre-parición",k:"Esquila"},{m:10,t:"Inicio parición",k:"Encaste"},{m:12,t:"Señalada",k:"Señalada"}]};}
+var S;try{S=JSON.parse(localStorage.getItem("cameron"))||seed();}catch(e){S=seed();}
+function save(){try{localStorage.setItem("cameron",JSON.stringify(S));}catch(e){alert("No se pudo guardar (memoria llena, probá con menos fotos).");}}
+function cant(r){return r.ev.reduce(function(s,e){return s+(+e.c||0);},0);}
+function fmt(iso){if(!iso)return "";var p=iso.split("-");return p[2]+"/"+p[1]+"/"+p[0];}
+function chip(t,p){p=p||["#F1EFE8","#444441"];return '<span class="chip" style="background:'+p[0]+';color:'+p[1]+'">'+t+'</span>';}
+function sgn(c){return c>0?"+"+c:(c<0?String(c):"·");}
+function esc(s){return (s||"").replace(/</g,"&lt;");}
+var view="rebanos",sel=null,edit=false;
+var stage=document.getElementById("stage"),nav=document.getElementById("nav"),top=document.getElementById("top"),fab=document.getElementById("fab"),modal=document.getElementById("modal");
+function go(v,dir){stage.style.opacity="0";stage.style.transform=dir==="in"?"translateX(16px)":(dir==="back"?"translateX(-16px)":"translateY(8px)");setTimeout(function(){view=v;edit=false;window.scrollTo(0,0);draw();stage.style.transform="translateX(0)";stage.style.opacity="1";},150);}
+function draw(){topbar();({rebanos:rebanos,rebano:rebano,calendario:cal,campo:campo}[view])();navbar();fabber();}
+function topbar(){
+ var T={rebanos:"Rebaños",rebano:sel?sel.id+" · "+sel.cat:"",calendario:"Calendario de faenas",campo:"Historia del campo"};
+ var left=view==="rebano"?'<span class="bk" id="bk"><i class="ti ti-chevron-left"></i></span>':'<div class="ic"><i class="ti ti-mountain"></i></div>';
+ top.innerHTML=left+'<div style="flex:1"><h1>'+T[view]+'</h1><div class="sub">Estancia Cameron</div></div>'+(view==="rebano"?'<span id="edt" style="cursor:pointer;font-size:13px;opacity:.9">'+(edit?"Listo":"Editar")+'</span>':'');
+ var b=document.getElementById("bk");if(b)b.onclick=function(){go("rebanos","back");};
+ var e=document.getElementById("edt");if(e)e.onclick=function(){edit=!edit;draw();};
+}
+function rebanos(){
+ var tot=S.rebanos.reduce(function(s,r){return s+cant(r);},0);
+ var h='<div class="card row"><div><div style="font-size:12px;color:var(--mut)">Total animales</div><div class="big" style="font-size:27px">'+tot.toLocaleString("es-CL")+'</div></div><div style="text-align:right;color:var(--mut);font-size:12px">'+S.rebanos.length+' rebaños<br>activos</div></div>';
+ S.rebanos.forEach(function(r,i){h+='<div class="card lc" data-i="'+i+'" style="cursor:pointer"><div class="row"><div><div style="font-size:16px;font-weight:600;margin-bottom:5px">'+esc(r.id)+'</div>'+chip(r.cat,CAT[r.cat])+'</div><div style="text-align:right"><div class="big">'+cant(r)+'</div><div style="font-size:10px;color:var(--soft)"><i class="ti ti-map-pin" style="font-size:11px;vertical-align:-1px"></i> '+esc(r.pot)+' <i class="ti ti-chevron-right" style="font-size:12px;vertical-align:-1px"></i></div></div></div></div>';});
+ stage.innerHTML=h;
+ [].forEach.call(document.querySelectorAll(".lc"),function(el){el.onclick=function(){sel=S.rebanos[+el.getAttribute("data-i")];go("rebano","in");};});
+}
+function rebano(){
+ var r=sel,h="";
+ if(r.foto)h+='<img class="ph" src="'+r.foto+'">';
+ h+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin:'+(r.foto?"10px 0 15px":"0 0 15px")+'">';
+ h+='<div class="met"><div class="v">'+cant(r)+'</div><div class="l">Animales</div></div>';
+ r.campos.forEach(function(c,i){h+='<div class="met'+(edit?" ed":"")+'" data-fi="'+i+'"><span class="x fx">×</span><div class="v" style="font-size:15px">'+esc(c[1])+'</div><div class="l">'+esc(c[0])+'</div></div>';});
+ if(edit)h+='<div class="met" id="addf" style="cursor:pointer;border:1px dashed var(--line)"><div class="v" style="color:var(--acc)">+</div><div class="l">Indicador</div></div>';
+ h+='</div>';
+ h+='<div class="row" style="margin-bottom:8px"><h3 style="margin:0">Línea de tiempo</h3><span class="add" id="adde"><i class="ti ti-plus" style="vertical-align:-2px"></i> evento</span></div><div class="tl">';
+ r.ev.slice().sort(function(a,b){return a.f<b.f?1:-1;}).forEach(function(e){var oi=r.ev.indexOf(e);var p=TIPO[e.t];h+='<div class="it ev" data-ei="'+oi+'" style="cursor:pointer"><div class="dot" style="background:'+(p?p[1]:"#444")+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:2px">'+chip(e.t,p)+(e.c!=0?'<b style="font-size:13px;color:'+(e.c>0?"var(--ok)":"var(--bad)")+'">'+sgn(e.c)+'</b>':'')+'</div><div class="dsc">'+esc(e.x)+'</div>'+(e.foto?'<img class="thumb" src="'+e.foto+'">':'')+'</div>';});
+ h+='</div>';
+ h+='<button class="ghost" id="rfoto" style="margin-top:6px"><i class="ti ti-camera" style="vertical-align:-2px"></i> '+(r.foto?"Cambiar foto del rebaño":"Foto del rebaño")+'</button>';
+ stage.innerHTML=h;
+ var af=document.getElementById("addf");if(af)af.onclick=function(){fieldModal();};
+ [].forEach.call(document.querySelectorAll(".fx"),function(el){el.onclick=function(ev){ev.stopPropagation();var i=+el.closest(".met").getAttribute("data-fi");r.campos.splice(i,1);save();draw();};});
+ document.getElementById("adde").onclick=function(){evModal();};
+ [].forEach.call(document.querySelectorAll(".ev"),function(el){el.onclick=function(){evModal(+el.getAttribute("data-ei"));};});
+ document.getElementById("rfoto").onclick=function(){pick(function(d){r.foto=d;save();draw();});};
+}
+function cal(){
+ var h='<div class="sec-h">Faenas programadas · 2026 <span class="add" id="addfa" style="float:right"><i class="ti ti-plus" style="vertical-align:-2px"></i> agregar</span></div>';
+ for(var i=0;i<12;i++){var fs=S.faenas.filter(function(f){return f.m===i+1;});h+='<div style="display:flex;gap:11px;padding:8px 2px;border-bottom:1px solid var(--line)"><div style="min-width:32px;font-size:12px;font-weight:600;color:'+(fs.length?"var(--ink)":"var(--soft)")+'">'+MES[i]+'</div><div style="flex:1;display:flex;flex-wrap:wrap;gap:6px">'+(fs.length?fs.map(function(f){var p=TIPO[f.k];return '<span class="fa chip" data-t="'+esc(f.t)+'" style="cursor:pointer;background:'+(p?p[0]:"#F1EFE8")+';color:'+(p?p[1]:"#444")+'">'+esc(f.t)+'</span>';}).join(""):'<span style="font-size:11px;color:var(--soft)">—</span>')+'</div></div>';}
+ stage.innerHTML=h;
+ document.getElementById("addfa").onclick=function(){faenaModal();};
+ [].forEach.call(document.querySelectorAll(".fa"),function(el){el.onclick=function(){faenaModal(el.getAttribute("data-t"));};});
+}
+function campo(){
+ var all=[];S.rebanos.forEach(function(r){r.ev.forEach(function(e){all.push({l:r.id,f:e.f,t:e.t,c:e.c,x:e.x,foto:e.foto});});});
+ all.sort(function(a,b){return a.f<b.f?1:-1;});
+ var h='<div class="sec-h">Todo lo que pasó en Cameron</div><div class="tl">';
+ all.forEach(function(e){var p=TIPO[e.t];h+='<div class="it"><div class="dot" style="background:'+(p?p[1]:"#444")+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:2px"><b style="font-size:12px">'+esc(e.l)+'</b>'+chip(e.t,p)+(e.c!=0?'<b style="font-size:12px;color:'+(e.c>0?"var(--ok)":"var(--bad)")+'">'+sgn(e.c)+'</b>':'')+'</div><div class="dsc">'+esc(e.x)+'</div>'+(e.foto?'<img class="thumb" src="'+e.foto+'">':'')+'</div>';});
+ h+='</div>';stage.innerHTML=h;
+}
+function sheet(html){modal.innerHTML='<div class="ovl" id="ovl"><div class="sheet">'+html+'</div></div>';document.getElementById("ovl").onclick=function(e){if(e.target.id==="ovl")close();};}
+function close(){modal.innerHTML="";}
+function fieldModal(){sheet('<h3>Nuevo indicador o comentario</h3><label>Nombre</label><input id="fk" placeholder="Ej: Condición corporal, Nota"><label>Valor</label><input id="fv" placeholder="Ej: Buena, 3.5, texto libre"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="fs">Agregar</button></div>');document.getElementById("fs").onclick=function(){var k=document.getElementById("fk").value.trim();if(!k)return;sel.campos.push([k,document.getElementById("fv").value.trim()]);save();close();draw();};}
+function faenaModal(t){var f=t?S.faenas.filter(function(x){return x.t===t;})[0]:null;sheet('<h3>'+(f?"Editar faena":"Nueva faena")+'</h3><label>Nombre</label><input id="ft" value="'+(f?esc(f.t):"")+'"><label>Mes</label><select id="fm">'+MES.map(function(n,i){return '<option value="'+(i+1)+'"'+(f&&f.m===i+1?" selected":"")+'>'+n+'</option>';}).join("")+'</select><label>Tipo (color)</label><select id="fk">'+TIPOS.map(function(k){return '<option'+(f&&f.k===k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><div style="display:flex;gap:8px;margin-top:14px">'+(f?'<button class="ghost" id="fd" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="fsv">Guardar</button></div>');
+ document.getElementById("fsv").onclick=function(){var nt=document.getElementById("ft").value.trim()||"Faena",m=+document.getElementById("fm").value,k=document.getElementById("fk").value;if(f){f.t=nt;f.m=m;f.k=k;}else S.faenas.push({t:nt,m:m,k:k});save();close();draw();};
+ var d=document.getElementById("fd");if(d)d.onclick=function(){S.faenas=S.faenas.filter(function(x){return x!==f;});save();close();draw();};}
+function evModal(ei){var e=ei!=null?sel.ev[ei]:{f:new Date().toISOString().slice(0,10),t:"Comentario",c:0,x:"",foto:null};
+ sheet('<h3>'+(ei!=null?"Editar evento":"Nuevo evento")+'</h3><label>Fecha</label><input id="ef" type="date" value="'+(e.f||"")+'"><label>Tipo</label><select id="et">'+TIPOS.map(function(k){return '<option'+(e.t===k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><label>Cantidad (+ suma, − resta, 0 no cambia)</label><input id="ec" type="number" value="'+(e.c||0)+'"><label>Comentario</label><textarea id="ex" rows="2">'+esc(e.x)+'</textarea><label>Foto</label><button class="ghost" id="ep"><i class="ti ti-camera" style="vertical-align:-2px"></i> '+(e.foto?"Cambiar foto":"Agregar foto")+'</button><div id="epv">'+(e.foto?'<img class="ph" src="'+e.foto+'">':'')+'</div><div style="display:flex;gap:8px;margin-top:14px">'+(ei!=null?'<button class="ghost" id="ed" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="es">Guardar</button></div>');
+ var tmp={foto:e.foto};
+ document.getElementById("ep").onclick=function(){pick(function(d){tmp.foto=d;document.getElementById("epv").innerHTML='<img class="ph" src="'+d+'">';});};
+ document.getElementById("es").onclick=function(){var o={f:document.getElementById("ef").value,t:document.getElementById("et").value,c:+document.getElementById("ec").value||0,x:document.getElementById("ex").value.trim(),foto:tmp.foto};if(ei!=null)sel.ev[ei]=o;else sel.ev.push(o);save();close();draw();};
+ var d=document.getElementById("ed");if(d)d.onclick=function(){sel.ev.splice(ei,1);save();close();draw();};}
+function pick(cb){var inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.onchange=function(){var f=inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var mx=680,s=Math.min(1,mx/Math.max(img.width,img.height));var cv=document.createElement("canvas");cv.width=img.width*s;cv.height=img.height*s;cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL("image/jpeg",0.6));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
+function fabber(){fab.innerHTML=view==="rebanos"?'<button id="fabr"><i class="ti ti-plus" style="vertical-align:-2px"></i> Rebaño</button>':"";var b=document.getElementById("fabr");if(b)b.onclick=function(){rebModal();};}
+function rebModal(){sheet('<h3>Nuevo rebaño</h3><label>Nombre / ID</label><input id="ri" placeholder="Ej: L8"><label>Categoría</label><select id="rc">'+Object.keys(CAT).map(function(c){return '<option>'+c+'</option>';}).join("")+'</select><label>Potrero</label><input id="rp" placeholder="Ej: El consumo"><label>Cantidad inicial</label><input id="rn" type="number" value="0"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rs">Crear</button></div>');document.getElementById("rs").onclick=function(){var id=document.getElementById("ri").value.trim()||"Nuevo";var n=+document.getElementById("rn").value||0;S.rebanos.push({id:id,cat:document.getElementById("rc").value,pot:document.getElementById("rp").value.trim(),foto:null,campos:[],ev:n?[{f:new Date().toISOString().slice(0,10),t:"Alta",c:n,x:"Conteo inicial",foto:null}]:[]});save();close();draw();};}
+function navbar(){var T=[["rebanos","ti-layout-grid","Rebaños"],["calendario","ti-calendar","Calendario"],["campo","ti-timeline","Campo"]];nav.innerHTML=T.map(function(t){var on=view===t[0]||(view==="rebano"&&t[0]==="rebanos");return '<div class="tb '+(on?"on":"")+'" data-v="'+t[0]+'"><i class="ti '+t[1]+'"></i><div>'+t[2]+'</div></div>';}).join("");[].forEach.call(document.querySelectorAll(".tb"),function(el){el.onclick=function(){var v=el.getAttribute("data-v");if(v!==view)go(v,"fade");};});}
+draw();
+</script>
+</body>
+</html>
