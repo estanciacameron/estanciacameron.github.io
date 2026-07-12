@@ -17,8 +17,7 @@ body{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:
 #top{position:sticky;top:0;z-index:5;background:var(--acc);color:#fff;padding:calc(13px + env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:10px;}
 #top .ic{width:33px;height:33px;border-radius:9px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-size:18px;}
 #top .bk{cursor:pointer;font-size:24px;display:flex;margin-left:-4px;}
-#top h1{font-size:16px;font-weight:600;margin:0;line-height:1.1;}
-#top .sub{font-size:11px;opacity:.85;margin-top:1px;}
+#top h1{font-size:16px;font-weight:600;margin:0;line-height:1.1;}#top .sub{font-size:11px;opacity:.85;margin-top:1px;}
 #stage{flex:1;padding:14px;transition:opacity .16s,transform .2s;opacity:1;}
 #nav{position:sticky;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);}
 #nav .tb{flex:1;text-align:center;padding:9px 0 8px;cursor:pointer;color:var(--soft);transition:color .15s;}
@@ -38,7 +37,7 @@ body{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:
 .tl .it{position:relative;margin-bottom:13px;}
 .tl .dot{position:absolute;left:-17px;top:3px;width:11px;height:11px;border-radius:50%;border:2px solid var(--card);}
 .tl .dt{font-size:10px;color:var(--soft);}.tl .dsc{font-size:12px;color:var(--mut);margin-top:3px;}
-.lst{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);gap:10px;}
+.lst{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;gap:10px;}
 input,select,textarea,button{font-family:inherit;font-size:14px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);width:100%;}
 button{background:var(--acc);color:#fff;border:none;font-weight:600;cursor:pointer;}
 button.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line);}
@@ -61,38 +60,41 @@ label{font-size:12px;color:var(--mut);display:block;margin:9px 0 4px;}
 <datalist id="pots"></datalist>
 <script>
 var CAT={Ovejas:["#EAF3DE","#27500A"],Borregas:["#E1F5EE","#085041"],Capones:["#FAEEDA","#633806"],Carneros:["#EEEDFE","#3C3489"],Corderos:["#E6F1FB","#0C447C"],"Refugo/CUL":["#FCEBEB","#791F1F"]};
-var TIPO={Conteo:["#E1F5EE","#085041"],Movimiento:["#F1EFE8","#444441"],Muerte:["#FCEBEB","#791F1F"],Venta:["#FCEBEB","#791F1F"],Compra:["#EAF3DE","#27500A"],Dosificación:["#E6F1FB","#0C447C"],Desparasitación:["#E6F1FB","#0C447C"],Vacunación:["#E6F1FB","#0C447C"],Encaste:["#FBEAF0","#72243E"],Señalada:["#FBEAF0","#72243E"],Esquila:["#FAEEDA","#633806"],Comentario:["#F1EFE8","#444441"]};
-var TIPOS=Object.keys(TIPO);
+var TIPO={Conteo:["#E1F5EE","#085041"],Movimiento:["#F1EFE8","#444441"],Traspaso:["#FAEEDA","#633806"],Ingreso:["#EAF3DE","#27500A"],Muerte:["#FCEBEB","#791F1F"],Venta:["#FCEBEB","#791F1F"],Compra:["#EAF3DE","#27500A"],Dosificación:["#E6F1FB","#0C447C"],Desparasitación:["#E6F1FB","#0C447C"],Vacunación:["#E6F1FB","#0C447C"],Encaste:["#FBEAF0","#72243E"],Señalada:["#FBEAF0","#72243E"],Esquila:["#FAEEDA","#633806"],Comentario:["#F1EFE8","#444441"]};
+var TIPOS=Object.keys(TIPO).filter(function(k){return k!="Ingreso";});
 var SANIDAD=["Dosificación","Desparasitación","Vacunación"];
 var PRODUCTOS=["Vitamina ADE","Ivermectina 1%","Levamisol","Closantel","Clostrivac 1","Clostrivac 2","Otro"];
 var POTREROS=["El 1","Faja del 1","1 de arriba","Baño de arriba","Baño del medio","Baño de abajo","El consumo","La antena","Toros 1","Toros 2 (siembra)","Toros 2 (natural)","Toros 3","Toros 4","Tropilla 1","Tropilla 2","Tropilla 3","8 de abajo","8 de arriba","Bautismo","Pantano de abajo","Pantano de arriba","9 de arriba"];
 document.getElementById("pots").innerHTML=POTREROS.map(function(p){return '<option value="'+p+'">';}).join("");
 var MES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 function seed(){return {rebanos:[
- {id:"L1",cat:"Ovejas",potreros:["El 1","1 de arriba"],campos:[],ev:[
-   {f:"2025-03-01",t:"Conteo",n:820,x:"Conteo inicial"},{f:"2025-04-20",t:"Encaste",ovejas:815,carneros:20,x:""},{f:"2025-09-20",t:"Esquila",etipo:"Completa",x:""},{f:"2025-12-15",t:"Señalada",corderos:690,x:"Total de corderos del lote"},{f:"2026-03-15",t:"Dosificación",prod:"Vitamina ADE",ml:"1 ml",x:""},{f:"2026-05-20",t:"Muerte",n:6,x:"Predación (zorro)"},{f:"2026-06-10",t:"Conteo",n:490,x:"Conteo en manga"},{f:"2026-06-15",t:"Movimiento",potreros:["El 1","1 de arriba"],x:"Puertas abiertas entre potreros"}]},
- {id:"L2",cat:"Borregas",potreros:["Faja del 1"],campos:[],ev:[{f:"2025-03-01",t:"Conteo",n:310,x:"Conteo inicial"},{f:"2026-03-15",t:"Desparasitación",prod:"Ivermectina 1%",ml:"1 ml/50kg",x:""},{f:"2026-07-02",t:"Conteo",n:308,x:""}]},
- {id:"L3",cat:"Capones",potreros:["Toros 1"],campos:[],ev:[{f:"2025-03-01",t:"Conteo",n:460,x:"Conteo inicial"},{f:"2025-09-20",t:"Esquila",etipo:"Completa",x:""},{f:"2026-07-05",t:"Muerte",n:3,x:"Neumonía"},{f:"2026-07-08",t:"Venta",n:200,x:"Frigorífico"}]},
- {id:"L4",cat:"Ovejas",potreros:["Tropilla 1"],campos:[],ev:[{f:"2026-05-10",t:"Conteo",n:300,x:"Separadas de L1"}]},
- {id:"L5",cat:"Corderos",potreros:["El 1"],campos:[],ev:[{f:"2026-02-20",t:"Conteo",n:665,x:"Destete de L1"},{f:"2026-04-01",t:"Muerte",n:10,x:"Frío/debilidad"}]},
- {id:"L6",cat:"Carneros",potreros:["La antena"],campos:[],ev:[{f:"2025-03-01",t:"Conteo",n:22,x:"Padres Corriedale"}]},
- {id:"L7",cat:"Refugo/CUL",potreros:["Bautismo"],campos:[],ev:[{f:"2026-06-20",t:"Conteo",n:40,x:"Ovejas viejas"}]}
+ {id:"L1",cat:"Ovejas",estado:"activo",potreros:["El 1","1 de arriba"],campos:[],ev:[
+   {f:"2025-03-01",t:"Conteo",n:820,x:"Conteo inicial de la majada"},{f:"2025-04-20",t:"Encaste",ovejas:815,carneros:20,x:""},{f:"2025-09-20",t:"Esquila",etipo:"Completa",x:""},{f:"2025-12-15",t:"Señalada",corderos:690,x:"Total de corderos del lote"},{f:"2026-02-20",t:"Traspaso",n:665,destino:"L5",x:"Destete: corderos a L5"},{f:"2026-03-15",t:"Dosificación",prod:"Vitamina ADE",ml:"1 ml",x:""},{f:"2026-05-10",t:"Traspaso",n:300,destino:"L4",x:"Formación de L4"},{f:"2026-05-20",t:"Muerte",n:6,x:"Predación (zorro)"},{f:"2026-06-10",t:"Conteo",n:490,x:"Conteo en manga"},{f:"2026-06-15",t:"Movimiento",potreros:["El 1","1 de arriba"],x:"Puertas abiertas entre potreros"}]},
+ {id:"L2",cat:"Borregas",estado:"activo",potreros:["Faja del 1"],campos:[],ev:[{f:"2025-03-01",t:"Conteo",n:310,x:"Conteo inicial"},{f:"2026-03-15",t:"Desparasitación",prod:"Ivermectina 1%",ml:"1 ml/50kg",x:""},{f:"2026-07-02",t:"Conteo",n:308,x:""}]},
+ {id:"L3",cat:"Capones",estado:"activo",potreros:["Toros 1"],campos:[],ev:[{f:"2025-03-01",t:"Conteo",n:460,x:"Conteo inicial"},{f:"2025-09-20",t:"Esquila",etipo:"Completa",x:""},{f:"2026-07-05",t:"Muerte",n:3,x:"Neumonía"},{f:"2026-07-08",t:"Venta",n:200,x:"Frigorífico"}]},
+ {id:"L4",cat:"Ovejas",estado:"activo",potreros:["Tropilla 1"],campos:[],ev:[{f:"2026-05-10",t:"Ingreso",n:300,origen:"L1",x:"Separadas de L1"}]},
+ {id:"L5",cat:"Corderos",estado:"activo",potreros:["El 1"],campos:[],ev:[{f:"2026-02-20",t:"Ingreso",n:665,origen:"L1",x:"Destete de L1"},{f:"2026-04-01",t:"Muerte",n:10,x:"Frío/debilidad"}]},
+ {id:"L6",cat:"Carneros",estado:"activo",potreros:["La antena"],campos:[],ev:[{f:"2025-03-01",t:"Conteo",n:22,x:"Padres Corriedale"}]},
+ {id:"L7",cat:"Refugo/CUL",estado:"activo",potreros:["Bautismo"],campos:[],ev:[{f:"2026-06-20",t:"Conteo",n:40,x:"Ovejas viejas"}]}
 ],faenas:[
  {fecha:"2026-01-15",t:"Recuento de verano",k:"Conteo",lote:null},{fecha:"2026-03-10",t:"Dosificación general",k:"Dosificación",lote:null},{fecha:"2026-04-20",t:"Encaste",k:"Encaste",lote:"L1"},{fecha:"2026-05-15",t:"Venta de capones",k:"Venta",lote:"L3"},{fecha:"2026-06-05",t:"Vacunación Clostrivac 1",k:"Vacunación",lote:null},{fecha:"2026-07-05",t:"Vacunación Clostrivac 2",k:"Vacunación",lote:null},{fecha:"2026-07-10",t:"Antiparasitario",k:"Desparasitación",lote:null},{fecha:"2026-09-20",t:"Esquila pre-parición",k:"Esquila",lote:null},{fecha:"2026-12-10",t:"Señalada",k:"Señalada",lote:"L1"}
 ]};}
-var S;try{S=JSON.parse(localStorage.getItem("cameron_v3"))||seed();}catch(e){S=seed();}
-function save(){try{localStorage.setItem("cameron_v3",JSON.stringify(S));}catch(e){alert("No se pudo guardar (memoria llena).");}}
+var S;try{S=JSON.parse(localStorage.getItem("cameron_v4"))||seed();}catch(e){S=seed();}
+function save(){try{localStorage.setItem("cameron_v4",JSON.stringify(S));}catch(e){alert("No se pudo guardar (memoria llena).");}}
 function byF(a,b){return a.f<b.f?-1:1;}
-function cant(r){var run=0;r.ev.slice().sort(byF).forEach(function(e){if(e.t=="Conteo")run=+e.n||0;else if(e.t=="Muerte"||e.t=="Venta")run-=+e.n||0;else if(e.t=="Compra")run+=+e.n||0;});return run;}
+function cant(r){var run=0;r.ev.slice().sort(byF).forEach(function(e){if(e.t=="Conteo")run=+e.n||0;else if(e.t=="Muerte"||e.t=="Venta"||e.t=="Traspaso")run-=+e.n||0;else if(e.t=="Compra"||e.t=="Ingreso")run+=+e.n||0;});return run;}
 function last(r,t){var a=r.ev.filter(function(e){return e.t==t;}).sort(byF);return a.length?a[a.length-1]:null;}
 function paricion(r){var e=last(r,"Encaste"),s=last(r,"Señalada");if(e&&s&&e.ovejas&&s.corderos)return Math.round(1000*s.corderos/e.ovejas)/10;return null;}
 function fmt(iso){if(!iso)return "";var p=iso.split("-");return p[2]+"/"+p[1]+"/"+p[0];}
 function chip(t,p){p=p||["#F1EFE8","#444441"];return '<span class="chip" style="background:'+p[0]+';color:'+p[1]+'">'+t+'</span>';}
+function catChip(r){return r.cat?chip(r.cat,CAT[r.cat]||["#F1EFE8","#444441"]):'';}
 function esc(s){return (s+"").replace(/</g,"&lt;");}
-function evDesc(e){if(e.t=="Conteo")return "Contadas: "+(e.n||0)+(e.x?" · "+esc(e.x):"");if(e.t=="Muerte"||e.t=="Venta"||e.t=="Compra")return (e.n||0)+(e.x?" · "+esc(e.x):"");if(SANIDAD.indexOf(e.t)>=0)return (e.prod||"")+(e.ml?" · "+esc(e.ml):"")+(e.x?" · "+esc(e.x):"");if(e.t=="Encaste")return (e.ovejas||0)+" ovejas · "+(e.carneros||0)+" carneros"+(e.ovejas&&e.carneros?" (1:"+Math.round(e.ovejas/e.carneros)+")":"");if(e.t=="Señalada")return (e.corderos||0)+" corderos"+(e.x?" · "+esc(e.x):"");if(e.t=="Esquila")return (e.etipo||"")+(e.x?" · "+esc(e.x):"");if(e.t=="Movimiento")return (e.potreros||[]).join(" + ")+(e.x?" · "+esc(e.x):"");return esc(e.x||"");}
-function evDelta(e){if(e.t=="Muerte"||e.t=="Venta")return -(+e.n||0);if(e.t=="Compra")return +e.n||0;return 0;}
+function evDesc(e){if(e.t=="Conteo")return "Contadas: "+(e.n||0)+(e.x?" · "+esc(e.x):"");if(e.t=="Traspaso")return (e.n||0)+" → "+esc(e.destino||"?")+(e.x?" · "+esc(e.x):"");if(e.t=="Ingreso")return (e.n||0)+" ← "+esc(e.origen||"?")+(e.x?" · "+esc(e.x):"");if(e.t=="Muerte"||e.t=="Venta"||e.t=="Compra")return (e.n||0)+(e.x?" · "+esc(e.x):"");if(SANIDAD.indexOf(e.t)>=0)return (e.prod||"")+(e.ml?" · "+esc(e.ml):"")+(e.x?" · "+esc(e.x):"");if(e.t=="Encaste")return (e.ovejas||0)+" ovejas · "+(e.carneros||0)+" carneros"+(e.ovejas&&e.carneros?" (1:"+Math.round(e.ovejas/e.carneros)+")":"");if(e.t=="Señalada")return (e.corderos||0)+" corderos"+(e.x?" · "+esc(e.x):"");if(e.t=="Esquila")return (e.etipo||"")+(e.x?" · "+esc(e.x):"");if(e.t=="Movimiento")return (e.potreros||[]).join(" + ")+(e.x?" · "+esc(e.x):"");return esc(e.x||"");}
+function evDelta(e){if(e.t=="Muerte"||e.t=="Venta"||e.t=="Traspaso")return -(+e.n||0);if(e.t=="Compra"||e.t=="Ingreso")return +e.n||0;return 0;}
+function activos(){return S.rebanos.filter(function(r){return r.estado!="cerrado";});}
+function cerrados(){return S.rebanos.filter(function(r){return r.estado=="cerrado";});}
 
-var view="rebanos",sel=null,sub="resumen",edit=false;
+var view="rebanos",sel=null,sub="resumen",edit=false,showClosed=false;
 var stage=document.getElementById("stage"),nav=document.getElementById("nav"),top=document.getElementById("top"),fab=document.getElementById("fab"),modal=document.getElementById("modal");
 history.replaceState({v:"rebanos"},"");
 window.addEventListener("popstate",function(e){var s=e.state||{v:"rebanos"};view=s.v||"rebanos";if(s.sel){sel=S.rebanos.filter(function(r){return r.id==s.sel;})[0];}else sel=null;sub=s.sub||"resumen";edit=false;draw();});
@@ -100,38 +102,34 @@ function nav2(v,dir){window.scrollTo(0,0);history.pushState({v:v,sel:sel?sel.id:
 function anim(dir){stage.style.opacity="0";stage.style.transform=dir=="in"?"translateX(16px)":(dir=="back"?"translateX(-16px)":"translateY(8px)");setTimeout(function(){stage.style.transform="translateX(0)";stage.style.opacity="1";},140);}
 function draw(){topbar();({rebanos:rebanos,rebano:rebano,calendario:cal,campo:campo}[view])();navbar();fabber();}
 function topbar(){
- var T={rebanos:"Rebaños",rebano:sel?sel.id+" · "+sel.cat:"",calendario:"Calendario",campo:"Historia del campo"};
+ var T={rebanos:"Rebaños",rebano:sel?sel.id+(sel.cat?" · "+sel.cat:""):"",calendario:"Calendario",campo:"Historia del campo"};
  var left=view=="rebano"?'<span class="bk" id="bk"><i class="ti ti-chevron-left"></i></span>':'<div class="ic"><i class="ti ti-mountain"></i></div>';
- top.innerHTML=left+'<div style="flex:1"><h1>'+T[view]+'</h1><div class="sub">Estancia Cameron</div></div>'+(view=="rebano"&&sub=="resumen"?'<span id="edt" style="cursor:pointer;font-size:13px;opacity:.9">'+(edit?"Listo":"Editar")+'</span>':'');
+ top.innerHTML=left+'<div style="flex:1"><h1>'+T[view]+(sel&&sel.estado=="cerrado"?' <span style="font-size:11px;opacity:.8">(cerrado)</span>':'')+'</h1><div class="sub">Estancia Cameron</div></div>'+(view=="rebano"&&sub=="resumen"?'<span id="edt" style="cursor:pointer;font-size:13px;opacity:.9">'+(edit?"Listo":"Editar")+'</span>':'');
  var b=document.getElementById("bk");if(b)b.onclick=function(){history.back();};
  var e=document.getElementById("edt");if(e)e.onclick=function(){edit=!edit;draw();};
 }
 function potChips(r){return r.potreros.map(function(p){return chip(p,["#EAF3DE","#27500A"]);}).join(" ");}
 function rebanos(){
- var tot=S.rebanos.reduce(function(s,r){return s+cant(r);},0);
- var h='<div class="card row"><div><div style="font-size:12px;color:var(--mut)">Total animales</div><div class="big" style="font-size:27px">'+tot.toLocaleString("es-CL")+'</div></div><div style="text-align:right;color:var(--mut);font-size:12px">'+S.rebanos.length+' rebaños</div></div>';
- S.rebanos.forEach(function(r,i){h+='<div class="card lc" data-i="'+i+'" style="cursor:pointer"><div class="row"><div><div style="font-size:16px;font-weight:600;margin-bottom:5px">'+esc(r.id)+'</div>'+chip(r.cat,CAT[r.cat])+'</div><div style="text-align:right"><div class="big">'+cant(r)+'</div><div style="font-size:10px;color:var(--soft);max-width:150px"><i class="ti ti-map-pin" style="font-size:11px;vertical-align:-1px"></i> '+r.potreros.map(esc).join(", ")+' <i class="ti ti-chevron-right" style="font-size:12px;vertical-align:-1px"></i></div></div></div></div>';});
+ var act=activos(),tot=act.reduce(function(s,r){return s+cant(r);},0),cer=cerrados();
+ var h='<div class="card row"><div><div style="font-size:12px;color:var(--mut)">Total animales</div><div class="big" style="font-size:27px">'+tot.toLocaleString("es-CL")+'</div></div><div style="text-align:right;color:var(--mut);font-size:12px">'+act.length+' rebaños</div></div>';
+ act.forEach(function(r){h+=cardRebano(r);});
+ if(cer.length){h+='<div class="add" id="tgc" style="text-align:center;padding:10px;font-size:13px">'+(showClosed?"Ocultar":"Ver")+' rebaños cerrados ('+cer.length+')</div>';if(showClosed)cer.forEach(function(r){h+=cardRebano(r,true);});}
  stage.innerHTML=h;
- [].forEach.call(document.querySelectorAll(".lc"),function(el){el.onclick=function(){sel=S.rebanos[+el.getAttribute("data-i")];sub="resumen";nav2("rebano","in");};});
+ [].forEach.call(document.querySelectorAll(".lc"),function(el){el.onclick=function(){sel=S.rebanos.filter(function(r){return r.id==el.getAttribute("data-id");})[0];sub="resumen";nav2("rebano","in");};});
+ var t=document.getElementById("tgc");if(t)t.onclick=function(){showClosed=!showClosed;draw();};
 }
-function subnav(){
- var tabs=[["resumen","Resumen"],["sanidad","Sanidad"],["reproduccion","Reproducción"],["movimientos","Movimientos"],["historial","Historial"]];
- return '<div class="subnav">'+tabs.map(function(t){return '<span class="p '+(sub==t[0]?"on":"")+'" data-s="'+t[0]+'">'+t[1]+'</span>';}).join("")+'</div>';
-}
+function cardRebano(r,cerr){return '<div class="card lc" data-id="'+esc(r.id)+'" style="cursor:pointer;'+(cerr?"opacity:.6":"")+'"><div class="row"><div><div style="font-size:16px;font-weight:600;margin-bottom:5px">'+esc(r.id)+(cerr?' <span style="font-size:11px;color:var(--soft)">cerrado</span>':'')+'</div>'+catChip(r)+'</div><div style="text-align:right"><div class="big">'+cant(r)+'</div><div style="font-size:10px;color:var(--soft);max-width:150px"><i class="ti ti-map-pin" style="font-size:11px;vertical-align:-1px"></i> '+r.potreros.map(esc).join(", ")+' <i class="ti ti-chevron-right" style="font-size:12px;vertical-align:-1px"></i></div></div></div></div>';}
+function subnav(){var tabs=[["resumen","Resumen"],["sanidad","Sanidad"],["reproduccion","Reproducción"],["movimientos","Movimientos"],["historial","Historial"]];return '<div class="subnav">'+tabs.map(function(t){return '<span class="p '+(sub==t[0]?"on":"")+'" data-s="'+t[0]+'">'+t[1]+'</span>';}).join("")+'</div>';}
 function rebano(){
  var r=sel,h=subnav();
- if(sub=="resumen")h+=resumen(r);
- else if(sub=="sanidad")h+=sanidad(r);
- else if(sub=="reproduccion")h+=repro(r);
- else if(sub=="movimientos")h+=movs(r);
- else h+=hist(r);
+ if(sub=="resumen")h+=resumen(r);else if(sub=="sanidad")h+=sanidad(r);else if(sub=="reproduccion")h+=repro(r);else if(sub=="movimientos")h+=movs(r);else h+=hist(r);
  stage.innerHTML=h;
  [].forEach.call(document.querySelectorAll(".subnav .p"),function(el){el.onclick=function(){sub=el.getAttribute("data-s");edit=false;draw();};});
  bind(r);
 }
-function met(v,l,u,rm){return '<div class="met">'+(rm&&edit?'<span class="x" data-rm="'+rm+'">×</span>':'')+'<div class="v">'+v+'<span class="u">'+(u||"")+'</span></div><div class="l">'+l+'</div></div>';}
+function met(v,l,u,rm){return '<div class="met">'+(rm!=null&&edit?'<span class="x" data-rm="'+rm+'">×</span>':'')+'<div class="v">'+v+'<span class="u">'+(u||"")+'</span></div><div class="l">'+l+'</div></div>';}
 function resumen(r){
- var uc=last(r,"Conteo"),par=paricion(r),enc=last(r,"Encaste");
+ var uc=last(r,"Conteo"),par=paricion(r);
  var m='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:6px">';
  m+='<div class="met"><div class="v">'+cant(r)+'</div><div class="l">Animales</div></div>';
  m+='<div class="met"><div class="v" style="font-size:14px">'+(uc?fmt(uc.f):"—")+'</div><div class="l">Últ. conteo</div></div>';
@@ -139,40 +137,45 @@ function resumen(r){
  r.campos.forEach(function(c,i){m+=met('<span style="font-size:14px">'+esc(c[1])+'</span>',esc(c[0]),"",i);});
  if(edit)m+='<div class="met" id="addf" style="cursor:pointer;border:1px dashed var(--line)"><div class="v" style="color:var(--acc)">+</div><div class="l">Indicador</div></div>';
  m+='</div>';
- m+='<div class="card" style="margin-top:10px"><div class="row"><span style="font-size:12px;color:var(--mut)"><i class="ti ti-map-pin" style="vertical-align:-2px"></i> Potreros actuales</span></div><div style="margin-top:8px">'+potChips(r)+'</div></div>';
+ m+='<div class="card" style="margin-top:10px"><span style="font-size:12px;color:var(--mut)"><i class="ti ti-map-pin" style="vertical-align:-2px"></i> Potreros actuales</span><div style="margin-top:8px">'+potChips(r)+'</div></div>';
  m+='<h3 style="margin-top:6px">Últimos eventos</h3><div class="tl">';
  r.ev.slice().sort(byF).reverse().slice(0,4).forEach(function(e){var p=TIPO[e.t];m+='<div class="it"><div class="dot" style="background:'+(p?p[1]:"#444")+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="margin-top:2px">'+chip(e.t,p)+'</div><div class="dsc">'+evDesc(e)+'</div></div>';});
- m+='</div>';return m;
+ m+='</div>';
+ if(edit)m+='<div style="display:flex;gap:8px;margin-top:8px">'+(r.estado!="cerrado"?'<button class="ghost" id="cerrar"><i class="ti ti-archive" style="vertical-align:-2px"></i> Cerrar rebaño</button>':'<button class="ghost" id="reabrir">Reabrir</button>')+'<button class="ghost" id="borrar" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button></div>';
+ return m;
 }
 function sanidad(r){
  var evs=r.ev.filter(function(e){return SANIDAD.indexOf(e.t)>=0;}).sort(byF).reverse();
  var h='<div class="row" style="margin-bottom:8px"><h3 style="margin:0">Dosis, desparasitaciones y vacunas</h3><span class="add" id="adds"><i class="ti ti-plus" style="vertical-align:-2px"></i></span></div>';
- if(!evs.length)h+='<div style="color:var(--soft);font-size:13px">Sin registros todavía. Tocá + para agregar.</div>';
+ if(!evs.length)h+='<div style="color:var(--soft);font-size:13px">Sin registros. Tocá + para agregar.</div>';
  evs.forEach(function(e){var oi=r.ev.indexOf(e);h+='<div class="card lst ev" data-ei="'+oi+'" style="cursor:pointer"><div><div style="font-size:14px;font-weight:600">'+esc(e.prod||e.t)+'</div><div style="font-size:12px;color:var(--mut);margin-top:2px">'+chip(e.t,TIPO[e.t])+' '+(e.ml?"· "+esc(e.ml):"")+'</div>'+(e.x?'<div style="font-size:12px;color:var(--soft);margin-top:3px">'+esc(e.x)+'</div>':'')+'</div><div style="font-size:11px;color:var(--soft);white-space:nowrap">'+fmt(e.f)+'</div></div>';});
  return h;
 }
 function repro(r){
  var enc=last(r,"Encaste"),sen=last(r,"Señalada"),par=paricion(r);
  var h='<div class="card"><div class="row"><h3 style="margin:0">Encaste</h3><span class="add" id="addenc">'+(enc?"editar":"+ agregar")+'</span></div>';
- if(enc)h+='<div style="margin-top:6px"><b style="font-size:20px;color:var(--acc)">'+enc.ovejas+'</b> ovejas encastadas · <b>'+enc.carneros+'</b> carneros<div style="font-size:12px;color:var(--mut);margin-top:3px">Proporción: 1 carnero cada '+(enc.carneros?Math.round(enc.ovejas/enc.carneros):"—")+' ovejas · '+fmt(enc.f)+'</div></div>';
- else h+='<div style="color:var(--soft);font-size:13px;margin-top:6px">Registrá cuántas ovejas se encastaron y con cuántos carneros.</div>';
- h+='</div>';
- h+='<div class="card"><div class="row"><h3 style="margin:0">Señalada (corderos)</h3><span class="add" id="addsen">'+(sen?"editar":"+ agregar")+'</span></div>';
+ if(enc)h+='<div style="margin-top:6px"><b style="font-size:20px;color:var(--acc)">'+enc.ovejas+'</b> ovejas · <b>'+enc.carneros+'</b> carneros<div style="font-size:12px;color:var(--mut);margin-top:3px">1 carnero cada '+(enc.carneros?Math.round(enc.ovejas/enc.carneros):"—")+' ovejas · '+fmt(enc.f)+'</div></div>';
+ else h+='<div style="color:var(--soft);font-size:13px;margin-top:6px">Registrá ovejas encastadas y carneros.</div>';
+ h+='</div><div class="card"><div class="row"><h3 style="margin:0">Señalada (corderos)</h3><span class="add" id="addsen">'+(sen?"editar":"+ agregar")+'</span></div>';
  if(sen)h+='<div style="margin-top:6px"><b style="font-size:20px;color:var(--acc)">'+sen.corderos+'</b> corderos señalados<div style="font-size:12px;color:var(--mut);margin-top:3px">'+fmt(sen.f)+'</div></div>';
  else h+='<div style="color:var(--soft);font-size:13px;margin-top:6px">Total de corderos obtenidos del lote.</div>';
- h+='</div>';
- h+='<div class="card" style="background:var(--acc);color:#fff;border:none"><div style="font-size:12px;opacity:.85">Parición</div><div style="font-size:30px;font-weight:600">'+(par!=null?par+"%":"—")+'</div><div style="font-size:12px;opacity:.85">'+(enc&&sen?sen.corderos+" corderos ÷ "+enc.ovejas+" ovejas encastadas":"Se calcula sola con encaste y señalada")+'</div></div>';
+ h+='</div><div class="card" style="background:var(--acc);color:#fff;border:none"><div style="font-size:12px;opacity:.85">Parición</div><div style="font-size:30px;font-weight:600">'+(par!=null?par+"%":"—")+'</div><div style="font-size:12px;opacity:.85">'+(enc&&sen?sen.corderos+" corderos ÷ "+enc.ovejas+" ovejas encastadas":"Se calcula con encaste y señalada")+'</div></div>';
  return h;
 }
 function movs(r){
  var uc=last(r,"Conteo");
- var trail=[];r.ev.slice().sort(byF).forEach(function(e){if(e.t=="Movimiento"&&e.potreros)e.potreros.forEach(function(p){if(trail.indexOf(p)<0)trail.push(p);});});
- r.potreros.forEach(function(p){if(trail.indexOf(p)<0)trail.push(p);});
- var h='<div class="card"><div style="font-size:12px;color:var(--mut)">Último conteo</div><div class="big" style="font-size:26px">'+(uc?uc.n:"—")+'</div><div style="font-size:12px;color:var(--soft)">'+(uc?fmt(uc.f)+(uc.x?" · "+esc(uc.x):""):"Sin conteos")+'</div></div>';
- h+='<div class="card"><div class="row"><span style="font-size:12px;color:var(--mut)">Potreros actuales (puede ser más de uno)</span></div><div style="margin-top:8px">'+potChips(r)+'</div></div>';
+ var trail=[];r.ev.slice().sort(byF).forEach(function(e){if(e.t=="Movimiento"&&e.potreros)e.potreros.forEach(function(p){if(trail.indexOf(p)<0)trail.push(p);});});r.potreros.forEach(function(p){if(trail.indexOf(p)<0)trail.push(p);});
+ var ing=r.ev.filter(function(e){return e.t=="Ingreso";}).sort(byF);var ini=r.ev.filter(function(e){return e.t=="Conteo";}).sort(byF)[0];
+ var h='<div class="card" style="border-color:var(--acc)"><div style="font-size:12px;color:var(--mut);margin-bottom:6px"><i class="ti ti-git-merge" style="vertical-align:-2px"></i> Cómo se conformó este lote</div>';
+ if(ini)h+='<div style="font-size:13px;margin-bottom:4px">• '+fmt(ini.f)+' — '+esc(ini.x||"Conteo inicial")+' ('+ini.n+')</div>';
+ ing.forEach(function(e){h+='<div style="font-size:13px;margin-bottom:4px">• '+fmt(e.f)+' — '+(e.n||0)+' animales desde <b>'+esc(e.origen||"?")+'</b>'+(e.x?' ('+esc(e.x)+')':'')+'</div>';});
+ if(!ini&&!ing.length)h+='<div style="font-size:13px;color:var(--soft)">Sin origen registrado.</div>';
+ h+='</div>';
+ h+='<div class="card"><div style="font-size:12px;color:var(--mut)">Último conteo</div><div class="big" style="font-size:26px">'+(uc?uc.n:"—")+'</div><div style="font-size:12px;color:var(--soft)">'+(uc?fmt(uc.f)+(uc.x?" · "+esc(uc.x):""):"Sin conteos")+'</div></div>';
+ h+='<div class="card"><span style="font-size:12px;color:var(--mut)">Potreros actuales (puede ser más de uno)</span><div style="margin-top:8px">'+potChips(r)+'</div></div>';
  h+='<div class="card"><div style="font-size:12px;color:var(--mut);margin-bottom:6px">Todos los campos por los que pasó</div><div>'+(trail.length?trail.map(function(p){return chip(p,["#F1EFE8","#444441"]);}).join(" "):"—")+'</div></div>';
  h+='<div class="row" style="margin:4px 0 8px"><h3 style="margin:0">Movimientos y conteos</h3><span class="add" id="addmov"><i class="ti ti-plus" style="vertical-align:-2px"></i></span></div><div class="tl">';
- r.ev.filter(function(e){return e.t=="Movimiento"||e.t=="Conteo";}).sort(byF).reverse().forEach(function(e){var p=TIPO[e.t];h+='<div class="it"><div class="dot" style="background:'+p[1]+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="margin-top:2px">'+chip(e.t,p)+'</div><div class="dsc">'+evDesc(e)+'</div></div>';});
+ r.ev.filter(function(e){return e.t=="Movimiento"||e.t=="Conteo"||e.t=="Traspaso"||e.t=="Ingreso";}).sort(byF).reverse().forEach(function(e){var p=TIPO[e.t];h+='<div class="it"><div class="dot" style="background:'+p[1]+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="margin-top:2px">'+chip(e.t,p)+'</div><div class="dsc">'+evDesc(e)+'</div></div>';});
  h+='</div>';return h;
 }
 function hist(r){
@@ -183,18 +186,23 @@ function hist(r){
 function bind(r){
  var af=document.getElementById("addf");if(af)af.onclick=fieldModal;
  [].forEach.call(document.querySelectorAll(".x[data-rm]"),function(el){el.onclick=function(ev){ev.stopPropagation();r.campos.splice(+el.getAttribute("data-rm"),1);save();draw();};});
- var ids={adds:["Dosificación"],adde:[null],addmov:["Movimiento"],addenc:["Encaste"],addsen:["Señalada"]};
- Object.keys(ids).forEach(function(k){var el=document.getElementById(k);if(el)el.onclick=function(){if(k=="addenc"){var e=last(r,"Encaste");evModal(e?r.ev.indexOf(e):null,"Encaste");}else if(k=="addsen"){var e=last(r,"Señalada");evModal(e?r.ev.indexOf(e):null,"Señalada");}else evModal(null,ids[k][0]);};});
+ var ids={adds:"Dosificación",adde:null,addmov:"Movimiento"};
+ Object.keys(ids).forEach(function(k){var el=document.getElementById(k);if(el)el.onclick=function(){evModal(null,ids[k]);};});
+ var ae=document.getElementById("addenc");if(ae)ae.onclick=function(){var e=last(r,"Encaste");evModal(e?r.ev.indexOf(e):null,"Encaste");};
+ var as=document.getElementById("addsen");if(as)as.onclick=function(){var e=last(r,"Señalada");evModal(e?r.ev.indexOf(e):null,"Señalada");};
  [].forEach.call(document.querySelectorAll(".ev"),function(el){el.onclick=function(){evModal(+el.getAttribute("data-ei"));};});
+ var cc=document.getElementById("cerrar");if(cc)cc.onclick=function(){cerrarModal(r);};
+ var rb=document.getElementById("reabrir");if(rb)rb.onclick=function(){r.estado="activo";save();draw();};
+ var bo=document.getElementById("borrar");if(bo)bo.onclick=function(){if(confirm("¿Borrar definitivamente este rebaño y toda su historia? Solo hacelo si fue un error de carga. Para disolver un lote conservando la historia, usá 'Cerrar rebaño'."))
+   {S.rebanos=S.rebanos.filter(function(x){return x!==r;});save();history.back();}};
 }
-/* ---------- Calendario ---------- */
 var calLote="",calFiltro="";
 function cal(){
- var h='<div style="display:flex;gap:8px;margin-bottom:12px"><select id="cl" style="flex:1"><option value="">Todos los rebaños</option>'+S.rebanos.map(function(r){return '<option value="'+r.id+'"'+(calLote==r.id?" selected":"")+'>'+r.id+'</option>';}).join("")+'</select><select id="cf" style="flex:1"><option value="">Todo evento</option>'+TIPOS.concat(["Encaste","Parición"]).filter(function(v,i,a){return a.indexOf(v)==i;}).map(function(k){return '<option'+(calFiltro==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select></div>';
+ var h='<div style="display:flex;gap:8px;margin-bottom:12px"><select id="cl" style="flex:1"><option value="">Todos los rebaños</option>'+S.rebanos.map(function(r){return '<option value="'+r.id+'"'+(calLote==r.id?" selected":"")+'>'+r.id+'</option>';}).join("")+'</select><select id="cf" style="flex:1"><option value="">Todo evento</option>'+TIPOS.concat(["Encaste"]).filter(function(v,i,a){return a.indexOf(v)==i;}).map(function(k){return '<option'+(calFiltro==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select></div>';
  h+='<div class="row" style="margin-bottom:8px"><span class="sec-h" style="margin:0">Faenas 2026</span><span class="add" id="addfa"><i class="ti ti-plus" style="vertical-align:-2px"></i> agregar</span></div>';
  var fs=S.faenas.filter(function(f){return (!calLote||f.lote==calLote)&&(!calFiltro||f.k==calFiltro);}).sort(byFecha);
  if(!fs.length)h+='<div style="color:var(--soft);font-size:13px">Sin faenas para este filtro.</div>';
- fs.forEach(function(f){var p=TIPO[f.k];h+='<div class="card lst fa" data-t="'+esc(f.t)+'" style="cursor:pointer"><div><div style="font-size:14px;font-weight:600">'+esc(f.t)+'</div><div style="margin-top:4px">'+chip(f.k,p)+(f.lote?' '+chip(f.lote,["#EAF3DE","#27500A"]):' '+chip("General",["#F1EFE8","#444441"]))+'</div></div><div style="text-align:right;white-space:nowrap"><div style="font-size:14px;font-weight:600;color:var(--acc)">'+fmt(f.fecha)+'</div></div></div>';});
+ fs.forEach(function(f){var p=TIPO[f.k];h+='<div class="card lst fa" data-t="'+esc(f.t)+'" style="cursor:pointer"><div><div style="font-size:14px;font-weight:600">'+esc(f.t)+'</div><div style="margin-top:4px">'+chip(f.k,p)+(f.lote?' '+chip(f.lote,["#EAF3DE","#27500A"]):' '+chip("General",["#F1EFE8","#444441"]))+'</div></div><div style="font-size:14px;font-weight:600;color:var(--acc);white-space:nowrap">'+fmt(f.fecha)+'</div></div>';});
  stage.innerHTML=h;
  document.getElementById("cl").onchange=function(){calLote=this.value;draw();};
  document.getElementById("cf").onchange=function(){calFiltro=this.value;draw();};
@@ -209,46 +217,56 @@ function campo(){
  all.forEach(function(o){var e=o.e,p=TIPO[e.t],d=evDelta(e);h+='<div class="it"><div class="dot" style="background:'+(p?p[1]:"#444")+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="display:flex;align-items:center;gap:6px;margin-top:2px"><b style="font-size:12px">'+esc(o.l)+'</b>'+chip(e.t,p)+(d?'<b style="font-size:12px;color:'+(d>0?"var(--ok)":"var(--bad)")+'">'+(d>0?"+"+d:d)+'</b>':'')+'</div><div class="dsc">'+evDesc(e)+'</div></div>';});
  h+='</div>';stage.innerHTML=h;
 }
-/* ---------- Modales ---------- */
 function sheet(html){modal.innerHTML='<div class="ovl" id="ovl"><div class="sheet">'+html+'</div></div>';document.getElementById("ovl").onclick=function(e){if(e.target.id=="ovl")close();};}
 function close(){modal.innerHTML="";}
 function fieldModal(){sheet('<h3>Nuevo indicador o comentario</h3><label>Nombre</label><input id="fk" placeholder="Ej: Condición corporal"><label>Valor</label><input id="fv" placeholder="Ej: Buena, texto libre"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="fs">Agregar</button></div>');document.getElementById("fs").onclick=function(){var k=document.getElementById("fk").value.trim();if(!k)return;sel.campos.push([k,document.getElementById("fv").value.trim()]);save();close();draw();};}
+function cerrarModal(r){var otros=activos().filter(function(x){return x.id!=r.id;});sheet('<h3>Cerrar rebaño '+esc(r.id)+'</h3><div style="font-size:13px;color:var(--mut);margin-bottom:6px">Los '+cant(r)+' animales pasan a:</div><label>Destino</label><select id="cd"><option value="">— Pasar a otro rebaño —</option>'+otros.map(function(x){return '<option value="'+x.id+'">'+x.id+(x.cat?" ("+x.cat+")":"")+'</option>';}).join("")+'<option value="__venta__">Vendidos</option><option value="__baja__">Baja / muertos</option></select><div style="font-size:12px;color:var(--soft);margin-top:8px">El rebaño queda archivado con toda su historia; lo podés ver en "rebaños cerrados".</div><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="cok">Cerrar rebaño</button></div>');
+ document.getElementById("cok").onclick=function(){var d=document.getElementById("cd").value,n=cant(r),hoy=new Date().toISOString().slice(0,10);if(!d){alert("Elegí un destino.");return;}
+  if(d=="__venta__")r.ev.push({f:hoy,t:"Venta",n:n,x:"Cierre del rebaño"});
+  else if(d=="__baja__")r.ev.push({f:hoy,t:"Muerte",n:n,x:"Cierre del rebaño"});
+  else{r.ev.push({f:hoy,t:"Traspaso",n:n,destino:d,x:"Cierre: animales a "+d});var dest=S.rebanos.filter(function(x){return x.id==d;})[0];if(dest)dest.ev.push({f:hoy,t:"Ingreso",n:n,origen:r.id,x:"Recibidos al cerrar "+r.id});}
+  r.estado="cerrado";save();close();history.back();};
+}
 function faenaModal(t){var f=t?S.faenas.filter(function(x){return x.t==t;})[0]:null;var ks=TIPOS.concat(["Encaste"]);sheet('<h3>'+(f?"Editar faena":"Nueva faena")+'</h3><label>Nombre</label><input id="ft" value="'+(f?esc(f.t):"")+'"><label>Fecha exacta</label><input id="fd" type="date" value="'+(f?f.fecha:"")+'"><label>Tipo de evento</label><select id="fk">'+ks.map(function(k){return '<option'+(f&&f.k==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><label>Rebaño (opcional)</label><select id="fl"><option value="">General (todos)</option>'+S.rebanos.map(function(r){return '<option'+(f&&f.lote==r.id?" selected":"")+'>'+r.id+'</option>';}).join("")+'</select><div style="display:flex;gap:8px;margin-top:14px">'+(f?'<button class="ghost" id="fdel" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="fsv">Guardar</button></div>');
  document.getElementById("fsv").onclick=function(){var o={t:document.getElementById("ft").value.trim()||"Faena",fecha:document.getElementById("fd").value,k:document.getElementById("fk").value,lote:document.getElementById("fl").value||null};if(f){Object.assign(f,o);}else S.faenas.push(o);save();close();draw();};
  var d=document.getElementById("fdel");if(d)d.onclick=function(){S.faenas=S.faenas.filter(function(x){return x!==f;});save();close();draw();};}
 function evModal(ei,forceT){
- var e=ei!=null?sel.ev[ei]:{f:new Date().toISOString().slice(0,10),t:forceT||"Conteo"};
- var t=e.t;var tmp={foto:e.foto};
- function fields(tp){
-  var h="";
-  if(tp=="Conteo")h+='<label>Cantidad contada</label><input id="v_n" type="number" value="'+(e.n||"")+'">';
-  else if(tp=="Muerte"||tp=="Venta"||tp=="Compra")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'">';
+ var e=ei!=null?sel.ev[ei]:{f:new Date().toISOString().slice(0,10),t:forceT||"Conteo"};var t=e.t;var tmp={foto:e.foto};
+ var opts=TIPOS.slice();if(opts.indexOf(t)<0)opts.push(t);
+ var otros=S.rebanos.filter(function(x){return x.id!=sel.id;});
+ function fields(tp){var h="";
+  if(tp=="Conteo"||tp=="Muerte"||tp=="Venta"||tp=="Compra")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'">';
+  else if(tp=="Traspaso")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'"><label>Rebaño destino</label><select id="v_dest">'+otros.map(function(x){return '<option value="'+x.id+'"'+(e.destino==x.id?" selected":"")+'>'+x.id+(x.cat?" ("+x.cat+")":"")+'</option>';}).join("")+'</select>';
   else if(SANIDAD.indexOf(tp)>=0)h+='<label>Producto</label><input id="v_prod" list="prods" value="'+esc(e.prod||"")+'"><label>Dosis / ml</label><input id="v_ml" placeholder="Ej: 1 ml, 2 ml SC" value="'+esc(e.ml||"")+'">';
   else if(tp=="Encaste")h+='<label>Ovejas encastadas</label><input id="v_ov" type="number" value="'+(e.ovejas||"")+'"><label>Carneros</label><input id="v_ca" type="number" value="'+(e.carneros||"")+'">';
   else if(tp=="Señalada")h+='<label>Corderos señalados (total del lote)</label><input id="v_co" type="number" value="'+(e.corderos||"")+'">';
   else if(tp=="Esquila")h+='<label>Tipo de esquila</label><select id="v_et"><option'+(e.etipo=="Completa"?" selected":"")+'>Completa</option><option'+(e.etipo=="Ojos-entrepierna"?" selected":"")+'>Ojos-entrepierna</option></select>';
-  else if(tp=="Movimiento")h+='<label>Potrero(s) — separá con coma si son varios</label><input id="v_pot" list="pots" value="'+esc((e.potreros||sel.potreros).join(", "))+'">';
-  return h;
- }
- sheet('<datalist id="prods">'+PRODUCTOS.map(function(p){return '<option value="'+p+'">';}).join("")+'</datalist><h3>'+(ei!=null?"Editar evento":"Nuevo evento")+'</h3><label>Fecha</label><input id="v_f" type="date" value="'+(e.f||"")+'"><label>Tipo</label><select id="v_t">'+TIPOS.map(function(k){return '<option'+(t==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><div id="dyn">'+fields(t)+'</div><label>Comentario</label><textarea id="v_x" rows="2">'+esc(e.x||"")+'</textarea><label>Foto</label><button class="ghost" id="v_p"><i class="ti ti-camera" style="vertical-align:-2px"></i> '+(e.foto?"Cambiar":"Agregar")+'</button><div id="v_pv">'+(e.foto?'<img class="ph" src="'+e.foto+'">':'')+'</div><div style="display:flex;gap:8px;margin-top:14px">'+(ei!=null?'<button class="ghost" id="v_d" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="v_s">Guardar</button></div>');
+  else if(tp=="Movimiento")h+='<label>Potrero(s) — separá con coma</label><input id="v_pot" list="pots" value="'+esc((e.potreros||sel.potreros).join(", "))+'">';
+  else if(tp=="Ingreso")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'"><label>Origen</label><input id="v_org" value="'+esc(e.origen||"")+'">';
+  return h;}
+ sheet('<datalist id="prods">'+PRODUCTOS.map(function(p){return '<option value="'+p+'">';}).join("")+'</datalist><h3>'+(ei!=null?"Editar evento":"Nuevo evento")+'</h3><label>Fecha</label><input id="v_f" type="date" value="'+(e.f||"")+'"><label>Tipo</label><select id="v_t">'+opts.map(function(k){return '<option'+(t==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><div id="dyn">'+fields(t)+'</div><label>Comentario</label><textarea id="v_x" rows="2">'+esc(e.x||"")+'</textarea><label>Foto</label><button class="ghost" id="v_p"><i class="ti ti-camera" style="vertical-align:-2px"></i> '+(e.foto?"Cambiar":"Agregar")+'</button><div id="v_pv">'+(e.foto?'<img class="ph" src="'+e.foto+'">':'')+'</div>'+(t=="Traspaso"?'<div style="font-size:11px;color:var(--soft);margin-top:6px">Al guardar, el rebaño destino recibe estos animales automáticamente.</div>':'')+'<div style="display:flex;gap:8px;margin-top:14px">'+(ei!=null?'<button class="ghost" id="v_d" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="v_s">Guardar</button></div>');
  document.getElementById("v_t").onchange=function(){document.getElementById("dyn").innerHTML=fields(this.value);};
  document.getElementById("v_p").onclick=function(){pick(function(d){tmp.foto=d;document.getElementById("v_pv").innerHTML='<img class="ph" src="'+d+'">';});};
- document.getElementById("v_s").onclick=function(){
-  var tp=document.getElementById("v_t").value;var o={f:document.getElementById("v_f").value,t:tp,x:document.getElementById("v_x").value.trim(),foto:tmp.foto};
-  function g(id){var el=document.getElementById(id);return el?el.value:"";}
-  if(tp=="Conteo"||tp=="Muerte"||tp=="Venta"||tp=="Compra")o.n=+g("v_n")||0;
+ document.getElementById("v_s").onclick=function(){var tp=document.getElementById("v_t").value;var o={f:document.getElementById("v_f").value,t:tp,x:document.getElementById("v_x").value.trim(),foto:tmp.foto};function g(id){var el=document.getElementById(id);return el?el.value:"";}
+  if(tp=="Conteo"||tp=="Muerte"||tp=="Venta"||tp=="Compra"||tp=="Traspaso"||tp=="Ingreso")o.n=+g("v_n")||0;
+  if(tp=="Traspaso"){o.destino=g("v_dest");var dest=S.rebanos.filter(function(x){return x.id==o.destino;})[0];if(dest&&ei==null)dest.ev.push({f:o.f,t:"Ingreso",n:o.n,origen:sel.id,x:"Desde "+sel.id});}
+  if(tp=="Ingreso")o.origen=g("v_org");
   if(SANIDAD.indexOf(tp)>=0){o.prod=g("v_prod");o.ml=g("v_ml");}
   if(tp=="Encaste"){o.ovejas=+g("v_ov")||0;o.carneros=+g("v_ca")||0;}
   if(tp=="Señalada")o.corderos=+g("v_co")||0;
   if(tp=="Esquila")o.etipo=g("v_et");
   if(tp=="Movimiento"){o.potreros=g("v_pot").split(",").map(function(s){return s.trim();}).filter(Boolean);sel.potreros=o.potreros.slice();}
-  if(ei!=null)sel.ev[ei]=o;else sel.ev.push(o);save();close();draw();
- };
+  if(ei!=null)sel.ev[ei]=o;else sel.ev.push(o);save();close();draw();};
  var d=document.getElementById("v_d");if(d)d.onclick=function(){sel.ev.splice(ei,1);save();close();draw();};
 }
 function pick(cb){var inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.onchange=function(){var f=inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var mx=680,s=Math.min(1,mx/Math.max(img.width,img.height));var cv=document.createElement("canvas");cv.width=img.width*s;cv.height=img.height*s;cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL("image/jpeg",0.6));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
-function fabber(){fab.innerHTML=view=="rebanos"?'<button id="fabr"><i class="ti ti-plus" style="vertical-align:-2px"></i> Rebaño</button>':(view=="rebano"?'<button id="fabe"><i class="ti ti-plus" style="vertical-align:-2px"></i> Evento</button>':"");var b=document.getElementById("fabr");if(b)b.onclick=rebModal;var e=document.getElementById("fabe");if(e)e.onclick=function(){evModal();};}
-function rebModal(){sheet('<h3>Nuevo rebaño</h3><label>Nombre / ID</label><input id="ri" placeholder="Ej: L8"><label>Categoría</label><select id="rc">'+Object.keys(CAT).map(function(c){return '<option>'+c+'</option>';}).join("")+'</select><label>Potrero(s) — separá con coma si son varios</label><input id="rp" list="pots" placeholder="Ej: El consumo"><label>Cantidad inicial (conteo)</label><input id="rn" type="number" value="0"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rs">Crear</button></div>');document.getElementById("rs").onclick=function(){var id=document.getElementById("ri").value.trim()||"Nuevo";var n=+document.getElementById("rn").value||0;var pot=document.getElementById("rp").value.split(",").map(function(s){return s.trim();}).filter(Boolean);S.rebanos.push({id:id,cat:document.getElementById("rc").value,potreros:pot.length?pot:["—"],campos:[],ev:n?[{f:new Date().toISOString().slice(0,10),t:"Conteo",n:n,x:"Conteo inicial"}]:[]});save();close();draw();};}
+function fabber(){fab.innerHTML=view=="rebanos"?'<button id="fabr"><i class="ti ti-plus" style="vertical-align:-2px"></i> Rebaño</button>':(view=="rebano"&&sel.estado!="cerrado"?'<button id="fabe"><i class="ti ti-plus" style="vertical-align:-2px"></i> Evento</button>':"");var b=document.getElementById("fabr");if(b)b.onclick=rebModal;var e=document.getElementById("fabe");if(e)e.onclick=function(){evModal();};}
+function rebModal(){var otros=activos();sheet('<h3>Nuevo rebaño</h3><label>Nombre / ID</label><input id="ri" placeholder="Ej: L8"><label>Categoría (opcional)</label><select id="rc"><option value="">— Sin categoría —</option>'+Object.keys(CAT).map(function(c){return '<option>'+c+'</option>';}).join("")+'</select><label>Potrero(s) — separá con coma</label><input id="rp" list="pots" placeholder="Ej: El consumo"><label>Origen (de dónde viene)</label><select id="ro"><option value="conteo">Conteo inicial</option><option value="compra">Compra</option>'+otros.map(function(x){return '<option value="from:'+x.id+'">Desde '+x.id+'</option>';}).join("")+'</select><label>Cantidad</label><input id="rn" type="number" value="0"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rs">Crear</button></div>');
+ document.getElementById("rs").onclick=function(){var id=document.getElementById("ri").value.trim()||"Nuevo";var n=+document.getElementById("rn").value||0;var pot=document.getElementById("rp").value.split(",").map(function(s){return s.trim();}).filter(Boolean);var org=document.getElementById("ro").value;var hoy=new Date().toISOString().slice(0,10);var ev=[];
+  if(n){if(org.indexOf("from:")==0){var src=org.slice(5);ev.push({f:hoy,t:"Ingreso",n:n,origen:src,x:"Desde "+src});var s=S.rebanos.filter(function(x){return x.id==src;})[0];if(s)s.ev.push({f:hoy,t:"Traspaso",n:n,destino:id,x:"Formación de "+id});}
+   else ev.push({f:hoy,t:"Conteo",n:n,x:org=="compra"?"Compra":"Conteo inicial"});}
+  S.rebanos.push({id:id,cat:document.getElementById("rc").value,estado:"activo",potreros:pot.length?pot:["—"],campos:[],ev:ev});save();close();draw();};
+}
 function navbar(){var T=[["rebanos","ti-layout-grid","Rebaños"],["calendario","ti-calendar","Calendario"],["campo","ti-timeline","Campo"]];nav.innerHTML=T.map(function(t){var on=view==t[0]||(view=="rebano"&&t[0]=="rebanos");return '<div class="tb '+(on?"on":"")+'" data-v="'+t[0]+'"><i class="ti '+t[1]+'"></i><div>'+t[2]+'</div></div>';}).join("");[].forEach.call(document.querySelectorAll(".tb"),function(el){el.onclick=function(){var v=el.getAttribute("data-v");if(v!=view){sel=null;nav2(v,"fade");}};});}
 draw();
 </script>
