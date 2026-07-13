@@ -99,7 +99,7 @@ function activos(){return S.rebanos.filter(function(r){return r.estado!="cerrado
 function cerrados(){return S.rebanos.filter(function(r){return r.estado=="cerrado";});}
 
 var view="rebanos",sel=null,sub="resumen",edit=false;
-var stage=document.getElementById("stage"),nav=document.getElementById("nav"),top=document.getElementById("top"),fab=document.getElementById("fab"),modal=document.getElementById("modal");
+var stage=document.getElementById("stage"),nav=document.getElementById("nav"),topEl=document.getElementById("top"),fab=document.getElementById("fab"),modal=document.getElementById("modal");
 history.replaceState({v:"rebanos"},"");
 window.addEventListener("popstate",function(e){var s=e.state||{v:"rebanos"};view=s.v||"rebanos";sel=s.sel?rebByUid(s.sel):null;sub=s.sub||"resumen";edit=false;draw();});
 function nav2(v,dir){window.scrollTo(0,0);history.pushState({v:v,sel:sel?sel.uid:null,sub:sub},"");anim(dir);view=v;draw();}
@@ -111,7 +111,7 @@ function topbar(){
  var right="";
  if(view=="rebanos"&&cerrados().length)right='<span class="act" id="arch" title="Archivo"><i class="ti ti-folder"></i></span>';
  if(view=="rebano"&&sub=="resumen")right='<span class="act" id="edt" style="font-size:13px">'+(edit?"Listo":"Editar")+'</span>';
- top.innerHTML=left+'<div style="flex:1"><h1>'+T[view]+(sel&&sel.estado=="cerrado"?' <span style="font-size:11px;opacity:.8">(cerrado)</span>':'')+'</h1><div class="sub">Estancia Cameron</div></div>'+right;
+ topEl.innerHTML=left+'<div style="flex:1"><h1>'+T[view]+(sel&&sel.estado=="cerrado"?' <span style="font-size:11px;opacity:.8">(cerrado)</span>':'')+'</h1><div class="sub">Estancia Cameron</div></div>'+right;
  var b=document.getElementById("bk");if(b)b.onclick=function(){history.back();};
  var e=document.getElementById("edt");if(e)e.onclick=function(){edit=!edit;draw();};
  var a=document.getElementById("arch");if(a)a.onclick=function(){nav2("archivo","in");};
