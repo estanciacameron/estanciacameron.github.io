@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cameron">
 <title>Ovinos Cameron</title>
-<meta name="build" content="v6-topbarfix">
+<meta name="build" content="v7-repartir">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
 <style>
 :root{--bg:#f4f3ee;--card:#fff;--line:#e5e3db;--ink:#2c2c2a;--mut:#6f6e68;--soft:#9a998f;--acc:#2E5A3C;--ok:#27500A;--bad:#a32d2d;}
@@ -156,6 +156,7 @@ function resumen(r){
  r.ev.slice().sort(byF).reverse().slice(0,4).forEach(function(e){var p=TIPO[e.t];m+='<div class="it"><div class="dot" style="background:'+(p?p[1]:"#444")+'"></div><div class="dt">'+fmt(e.f)+'</div><div style="margin-top:2px">'+chip(e.t,p)+'</div><div class="dsc">'+evDesc(e)+'</div></div>';});
  m+='</div>';
  if(edit){m+='<div style="display:flex;gap:8px;margin-top:8px"><button class="ghost" id="renom"><i class="ti ti-pencil" style="vertical-align:-2px"></i> Renombrar</button><button class="ghost" id="borrar" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button></div>';
+  m+=(r.estado!="cerrado"?'<button class="ghost" id="repartir" style="margin-top:8px"><i class="ti ti-arrows-split-2" style="vertical-align:-2px"></i> Repartir / mover animales</button>':'');
   m+=(r.estado!="cerrado"?'<button id="cerrar" style="margin-top:8px"><i class="ti ti-archive" style="vertical-align:-2px"></i> Cerrar y archivar rebaño</button>':'<button class="ghost" id="reabrir" style="margin-top:8px">Reabrir rebaño</button>');}
  return m;
 }
@@ -206,7 +207,8 @@ function bind(r){
  var ae=document.getElementById("addenc");if(ae)ae.onclick=function(){var e=last(r,"Encaste");evModal(e?r.ev.indexOf(e):null,"Encaste");};
  var as=document.getElementById("addsen");if(as)as.onclick=function(){var e=last(r,"Señalada");evModal(e?r.ev.indexOf(e):null,"Señalada");};
  [].forEach.call(document.querySelectorAll(".ev"),function(el){el.onclick=function(){evModal(+el.getAttribute("data-ei"));};});
- var cc=document.getElementById("cerrar");if(cc)cc.onclick=function(){cerrarModal(r);};
+ var cc=document.getElementById("cerrar");if(cc)cc.onclick=function(){splitModal(r,true);};
+ var rp=document.getElementById("repartir");if(rp)rp.onclick=function(){splitModal(r,false);};
  var rb=document.getElementById("reabrir");if(rb)rb.onclick=function(){r.estado="activo";save();draw();};
  var rn=document.getElementById("renom");if(rn)rn.onclick=function(){renomModal(r);};
  var bo=document.getElementById("borrar");if(bo)bo.onclick=function(){if(confirm("¿Borrar definitivamente este rebaño y toda su historia? Solo para errores de carga. Para disolver conservando la historia, usá 'Cerrar y archivar'."))
@@ -237,12 +239,43 @@ function campo(){
 function sheet(html){modal.innerHTML='<div class="ovl" id="ovl"><div class="sheet">'+html+'</div></div>';document.getElementById("ovl").onclick=function(e){if(e.target.id=="ovl")close();};}
 function close(){modal.innerHTML="";}
 function fieldModal(){sheet('<h3>Nuevo indicador o comentario</h3><label>Nombre</label><input id="fk" placeholder="Ej: Condición corporal"><label>Valor</label><input id="fv" placeholder="Ej: Buena, texto libre"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="fs">Agregar</button></div>');document.getElementById("fs").onclick=function(){var k=document.getElementById("fk").value.trim();if(!k)return;sel.campos.push([k,document.getElementById("fv").value.trim()]);save();close();draw();};}
-function cerrarModal(r){var otros=activos().filter(function(x){return x.uid!=r.uid;});sheet('<h3>Cerrar y archivar '+esc(r.id)+'</h3><div style="font-size:13px;color:var(--mut);margin-bottom:6px">Los '+cant(r)+' animales pasan a:</div><label>Destino</label><select id="cd"><option value="">— Elegí —</option>'+otros.map(function(x){return '<option value="'+x.uid+'">'+esc(x.id)+(x.cat?" ("+x.cat+")":"")+'</option>';}).join("")+'<option value="__venta__">Vendidos</option><option value="__baja__">Baja / muertos</option></select><div style="font-size:12px;color:var(--soft);margin-top:8px">El rebaño queda guardado en el <b>Archivo</b> con toda su historia (icono de carpeta arriba).</div><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="cok">Cerrar rebaño</button></div>');
- document.getElementById("cok").onclick=function(){var d=document.getElementById("cd").value,n=cant(r),hoy=new Date().toISOString().slice(0,10);if(!d){alert("Elegí un destino.");return;}
-  if(d=="__venta__")r.ev.push({f:hoy,t:"Venta",n:n,x:"Cierre del rebaño"});
-  else if(d=="__baja__")r.ev.push({f:hoy,t:"Muerte",n:n,x:"Cierre del rebaño"});
-  else{r.ev.push({f:hoy,t:"Traspaso",n:n,destino:d,x:"Cierre: animales a "+nameOf(d)});var dest=rebByUid(d);if(dest)dest.ev.push({f:hoy,t:"Ingreso",n:n,origen:r.uid,x:"Recibidos al cerrar "+r.id});}
-  r.estado="cerrado";save();close();history.back();};
+function splitModal(r,cerrar){
+ var total=cant(r);var rows=[{dest:"",n:"",name:"",pot:""}];
+ function optsFor(sel){var h='<option value="">— Destino —</option>';activos().forEach(function(x){if(x.uid!=r.uid)h+='<option value="'+x.uid+'"'+(sel==x.uid?" selected":"")+'>'+esc(x.id)+(x.cat?" ("+x.cat+")":"")+'</option>';});h+='<option value="__new__"'+(sel=="__new__"?" selected":"")+'>➕ Crear lote nuevo</option><option value="__venta__"'+(sel=="__venta__"?" selected":"")+'>Vendidos</option><option value="__baja__"'+(sel=="__baja__"?" selected":"")+'>Baja / muertos</option>';return h;}
+ function asignado(){return rows.reduce(function(s,x){return s+(+x.n||0);},0);}
+ function render(){
+  var rem=total-asignado();
+  var b='<h3>'+(cerrar?"Cerrar y repartir "+esc(r.id):"Repartir / mover animales de "+esc(r.id))+'</h3>';
+  b+='<div style="font-size:13px;color:var(--mut);margin-bottom:8px">Total: <b>'+total+'</b> · Sin asignar: <b id="d-rem" style="color:'+(rem<0?"var(--bad)":"var(--acc)")+'">'+rem+'</b></div>';
+  rows.forEach(function(x,i){
+   b+='<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px"><div style="display:flex;gap:8px"><select class="d-dest" data-i="'+i+'" style="flex:1">'+optsFor(x.dest)+'</select><input class="d-n" data-i="'+i+'" type="number" placeholder="cant." value="'+x.n+'" style="width:82px">'+(rows.length>1?'<button class="ghost d-rm" data-i="'+i+'" style="width:38px;padding:6px;color:var(--bad)">×</button>':'')+'</div>';
+   if(x.dest=="__new__")b+='<input class="d-name" data-i="'+i+'" placeholder="Nombre del lote nuevo" value="'+esc(x.name)+'" style="margin-top:8px"><input class="d-pot" data-i="'+i+'" list="pots" placeholder="Potrero (opcional)" value="'+esc(x.pot)+'" style="margin-top:6px">';
+   b+='</div>';
+  });
+  b+='<div class="add" id="d-add" style="margin:2px 0 12px;display:inline-block"><i class="ti ti-plus" style="vertical-align:-2px"></i> Agregar destino</div>';
+  b+='<div style="display:flex;gap:8px"><button class="ghost" onclick="close()">Cancelar</button><button id="d-ok">'+(cerrar?"Cerrar rebaño":"Aplicar")+'</button></div>';
+  sheet(b);
+  [].forEach.call(document.querySelectorAll(".d-dest"),function(el){el.onchange=function(){rows[+el.getAttribute("data-i")].dest=el.value;render();};});
+  [].forEach.call(document.querySelectorAll(".d-n"),function(el){el.oninput=function(){rows[+el.getAttribute("data-i")].n=el.value;var rr=document.getElementById("d-rem");if(rr){var rm=total-asignado();rr.textContent=rm;rr.style.color=rm<0?"var(--bad)":"var(--acc)";}};});
+  [].forEach.call(document.querySelectorAll(".d-name"),function(el){el.oninput=function(){rows[+el.getAttribute("data-i")].name=el.value;};});
+  [].forEach.call(document.querySelectorAll(".d-pot"),function(el){el.oninput=function(){rows[+el.getAttribute("data-i")].pot=el.value;};});
+  [].forEach.call(document.querySelectorAll(".d-rm"),function(el){el.onclick=function(){rows.splice(+el.getAttribute("data-i"),1);render();};});
+  document.getElementById("d-add").onclick=function(){rows.push({dest:"",n:"",name:"",pot:""});render();};
+  document.getElementById("d-ok").onclick=function(){
+   var asig=asignado();
+   if(cerrar&&asig!=total){alert("Para cerrar tenés que asignar los "+total+" animales. Ahora "+(asig<total?"faltan "+(total-asig):"sobran "+(asig-total))+".");return;}
+   if(!cerrar&&asig>total){alert("No podés mover más de "+total+" animales.");return;}
+   var hoy=new Date().toISOString().slice(0,10);
+   rows.forEach(function(x){var n=+x.n||0;if(n<=0||!x.dest)return;
+    if(x.dest=="__venta__")r.ev.push({f:hoy,t:"Venta",n:n,x:cerrar?"Cierre del rebaño":"Reparto"});
+    else if(x.dest=="__baja__")r.ev.push({f:hoy,t:"Muerte",n:n,x:cerrar?"Cierre del rebaño":"Reparto"});
+    else if(x.dest=="__new__"){var u=newUid();S.rebanos.push({uid:u,id:(x.name||"Nuevo").trim(),cat:"",estado:"activo",potreros:x.pot?[x.pot.trim()]:["—"],campos:[],ev:[{f:hoy,t:"Ingreso",n:n,origen:r.uid,x:"Desde "+r.id}]});r.ev.push({f:hoy,t:"Traspaso",n:n,destino:u,x:"A nuevo lote "+((x.name||"").trim())});}
+    else{var d=rebByUid(x.dest);if(d){d.ev.push({f:hoy,t:"Ingreso",n:n,origen:r.uid,x:"Desde "+r.id});r.ev.push({f:hoy,t:"Traspaso",n:n,destino:x.dest,x:"Reparto"});}}
+   });
+   if(cerrar)r.estado="cerrado";save();close();if(cerrar)history.back();else draw();
+  };
+ }
+ render();
 }
 function faenaModal(fi){var f=fi!=null?S.faenas[fi]:null;var ks=TIPOS.concat(["Encaste"]);sheet('<h3>'+(f?"Editar faena":"Nueva faena")+'</h3><label>Nombre</label><input id="ft" value="'+(f?esc(f.t):"")+'"><label>Fecha exacta</label><input id="fd" type="date" value="'+(f?f.fecha:"")+'"><label>Tipo de evento</label><select id="fk">'+ks.map(function(k){return '<option'+(f&&f.k==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><label>Rebaño (opcional)</label><select id="fl"><option value="">General (todos)</option>'+S.rebanos.map(function(r){return '<option value="'+r.uid+'"'+(f&&f.lote==r.uid?" selected":"")+'>'+esc(r.id)+'</option>';}).join("")+'</select><div style="display:flex;gap:8px;margin-top:14px">'+(f?'<button class="ghost" id="fdel" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="fsv">Guardar</button></div>');
  document.getElementById("fsv").onclick=function(){var o={t:document.getElementById("ft").value.trim()||"Faena",fecha:document.getElementById("fd").value,k:document.getElementById("fk").value,lote:document.getElementById("fl").value||null};if(f){Object.assign(f,o);}else S.faenas.push(o);save();close();draw();};
