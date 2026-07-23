@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cameron">
 <title>Ovinos Cameron</title>
-<meta name="build" content="v8-picker">
+<meta name="build" content="v9-reset">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
 <style>
 :root{--bg:#f4f3ee;--card:#fff;--line:#e5e3db;--ink:#2c2c2a;--mut:#6f6e68;--soft:#9a998f;--acc:#2E5A3C;--ok:#27500A;--bad:#a32d2d;}
@@ -108,13 +108,15 @@ function topbar(){
  var T={rebanos:"Rebaños",archivo:"Archivo",rebano:sel?sel.id+(sel.cat?" · "+sel.cat:""):"",calendario:"Calendario",campo:"Historia del campo"};
  var left=(view=="rebano"||view=="archivo")?'<span class="bk" id="bk"><i class="ti ti-chevron-left"></i></span>':'<div class="ic"><i class="ti ti-mountain"></i></div>';
  var right="";
- if(view=="rebanos"&&cerrados().length)right='<span class="act" id="arch" title="Archivo"><i class="ti ti-folder"></i></span>';
+ if(view=="rebanos")right='<div style="display:flex;gap:14px;align-items:center">'+(cerrados().length?'<span class="act" id="arch" title="Archivo"><i class="ti ti-folder"></i></span>':'')+'<span class="act" id="cfg" title="Opciones"><i class="ti ti-dots-vertical"></i></span></div>';
  if(view=="rebano"&&sub=="resumen")right='<span class="act" id="edt" style="font-size:13px">'+(edit?"Listo":"Editar")+'</span>';
  topEl.innerHTML=left+'<div style="flex:1"><h1>'+T[view]+(sel&&sel.estado=="cerrado"?' <span style="font-size:11px;opacity:.8">(cerrado)</span>':'')+'</h1><div class="sub">Estancia Cameron</div></div>'+right;
  var b=document.getElementById("bk");if(b)b.onclick=function(){history.back();};
  var e=document.getElementById("edt");if(e)e.onclick=function(){edit=!edit;draw();};
  var a=document.getElementById("arch");if(a)a.onclick=function(){nav2("archivo","in");};
+ var g=document.getElementById("cfg");if(g)g.onclick=function(){configModal();};
 }
+function configModal(){sheet('<h3>Opciones</h3><button class="ghost" id="cf-exp" style="margin-bottom:8px"><i class="ti ti-download" style="vertical-align:-2px"></i> Descargar copia de seguridad</button><button class="ghost" id="cf-demo" style="margin-bottom:8px"><i class="ti ti-refresh" style="vertical-align:-2px"></i> Restaurar datos de ejemplo</button><button id="cf-empty" style="background:var(--bad)"><i class="ti ti-eraser" style="vertical-align:-2px"></i> Empezar de cero (borrar todo)</button><div style="font-size:11px;color:var(--soft);margin-top:8px">"Empezar de cero" borra todos los rebaños, eventos y faenas de este dispositivo para que cargues los datos reales.</div><div style="margin-top:14px"><button class="ghost" onclick="close()">Cerrar</button></div>');document.getElementById("cf-exp").onclick=function(){var blob=new Blob([JSON.stringify(S)],{type:"application/json"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="cameron-copia-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();};document.getElementById("cf-demo").onclick=function(){if(confirm("¿Restaurar los datos de ejemplo? Se pierde lo que tengas cargado ahora.")){S=seed();save();close();view="rebanos";sel=null;draw();}};document.getElementById("cf-empty").onclick=function(){if(confirm("Esto borra TODOS los rebaños, eventos y faenas de este dispositivo para empezar con datos reales. ¿Seguro?")){S={rebanos:[],faenas:[]};save();close();view="rebanos";sel=null;draw();}};}
 function potChips(r){return r.potreros.map(function(p){return chip(p,["#EAF3DE","#27500A"]);}).join(" ");}
 function cardRebano(r,cerr){return '<div class="card lc" data-u="'+r.uid+'" style="cursor:pointer;'+(cerr?"opacity:.7":"")+'"><div class="row"><div><div style="font-size:16px;font-weight:600;margin-bottom:5px">'+esc(r.id)+(cerr?' <span style="font-size:11px;color:var(--soft)">cerrado</span>':'')+'</div>'+catChip(r)+'</div><div style="text-align:right"><div class="big">'+cant(r)+'</div><div style="font-size:10px;color:var(--soft);max-width:150px"><i class="ti ti-map-pin" style="font-size:11px;vertical-align:-1px"></i> '+r.potreros.map(esc).join(", ")+' <i class="ti ti-chevron-right" style="font-size:12px;vertical-align:-1px"></i></div></div></div></div>';}
 function bindCards(){[].forEach.call(document.querySelectorAll(".lc"),function(el){el.onclick=function(){sel=rebByUid(el.getAttribute("data-u"));sub="resumen";nav2("rebano","in");};});}
