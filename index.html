@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Cameron">
 <title>Ovinos Cameron</title>
-<meta name="build" content="v7-repartir">
+<meta name="build" content="v8-picker">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/tabler-icons.min.css">
 <style>
 :root{--bg:#f4f3ee;--card:#fff;--line:#e5e3db;--ink:#2c2c2a;--mut:#6f6e68;--soft:#9a998f;--acc:#2E5A3C;--ok:#27500A;--bad:#a32d2d;}
@@ -59,7 +59,6 @@ label{font-size:12px;color:var(--mut);display:block;margin:9px 0 4px;}
 <div id="fab" class="fab"></div>
 <div id="nav"></div>
 <div id="modal"></div>
-<datalist id="pots"></datalist>
 <script>
 var CAT={Ovejas:["#EAF3DE","#27500A"],Borregas:["#E1F5EE","#085041"],Capones:["#FAEEDA","#633806"],Carneros:["#EEEDFE","#3C3489"],Corderos:["#E6F1FB","#0C447C"],"Refugo/CUL":["#FCEBEB","#791F1F"]};
 var TIPO={Conteo:["#E1F5EE","#085041"],Movimiento:["#F1EFE8","#444441"],Traspaso:["#FAEEDA","#633806"],Ingreso:["#EAF3DE","#27500A"],Muerte:["#FCEBEB","#791F1F"],Venta:["#FCEBEB","#791F1F"],Compra:["#EAF3DE","#27500A"],Dosificación:["#E6F1FB","#0C447C"],Desparasitación:["#E6F1FB","#0C447C"],Vacunación:["#E6F1FB","#0C447C"],Encaste:["#FBEAF0","#72243E"],Señalada:["#FBEAF0","#72243E"],Esquila:["#FAEEDA","#633806"],Comentario:["#F1EFE8","#444441"]};
@@ -67,7 +66,6 @@ var TIPOS=Object.keys(TIPO).filter(function(k){return k!="Ingreso";});
 var SANIDAD=["Dosificación","Desparasitación","Vacunación"];
 var PRODUCTOS=["Vitamina ADE","Ivermectina 1%","Levamisol","Closantel","Clostrivac 1","Clostrivac 2","Otro"];
 var POTREROS=["El 1","Faja del 1","1 de arriba","Baño de arriba","Baño del medio","Baño de abajo","El consumo","La antena","Toros 1","Toros 2 (siembra)","Toros 2 (natural)","Toros 3","Toros 4","Tropilla 1","Tropilla 2","Tropilla 3","8 de abajo","8 de arriba","Bautismo","Pantano de abajo","Pantano de arriba","9 de arriba"];
-document.getElementById("pots").innerHTML=POTREROS.map(function(p){return '<option value="'+p+'">';}).join("");
 var MES=["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
 function newUid(){return 'r'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
 function seed(){return {rebanos:[
@@ -118,7 +116,7 @@ function topbar(){
  var a=document.getElementById("arch");if(a)a.onclick=function(){nav2("archivo","in");};
 }
 function potChips(r){return r.potreros.map(function(p){return chip(p,["#EAF3DE","#27500A"]);}).join(" ");}
-function cardRebano(r,cerr){return '<div class="card lc" data-u="'+r.uid+'" style="cursor:pointer;'+(cerr?"opacity:.7":"")+'"><div class="row"><div><div style="font-size:16px;font-weight:600;margin-bottom:5px">'+esc(r.id)+'</div>'+catChip(r)+'</div><div style="text-align:right"><div class="big">'+cant(r)+'</div><div style="font-size:10px;color:var(--soft);max-width:150px"><i class="ti ti-map-pin" style="font-size:11px;vertical-align:-1px"></i> '+r.potreros.map(esc).join(", ")+' <i class="ti ti-chevron-right" style="font-size:12px;vertical-align:-1px"></i></div></div></div></div>';}
+function cardRebano(r,cerr){return '<div class="card lc" data-u="'+r.uid+'" style="cursor:pointer;'+(cerr?"opacity:.7":"")+'"><div class="row"><div><div style="font-size:16px;font-weight:600;margin-bottom:5px">'+esc(r.id)+(cerr?' <span style="font-size:11px;color:var(--soft)">cerrado</span>':'')+'</div>'+catChip(r)+'</div><div style="text-align:right"><div class="big">'+cant(r)+'</div><div style="font-size:10px;color:var(--soft);max-width:150px"><i class="ti ti-map-pin" style="font-size:11px;vertical-align:-1px"></i> '+r.potreros.map(esc).join(", ")+' <i class="ti ti-chevron-right" style="font-size:12px;vertical-align:-1px"></i></div></div></div></div>';}
 function bindCards(){[].forEach.call(document.querySelectorAll(".lc"),function(el){el.onclick=function(){sel=rebByUid(el.getAttribute("data-u"));sub="resumen";nav2("rebano","in");};});}
 function rebanos(){
  var act=activos(),tot=act.reduce(function(s,r){return s+cant(r);},0);
@@ -128,7 +126,7 @@ function rebanos(){
 }
 function archivo(){
  var cer=cerrados();
- var h='<div class="sec-h"><i class="ti ti-folder" style="vertical-align:-2px"></i> Rebaños cerrados — su historia queda guardada acá</div>';
+ var h='<div class="sec-h"><i class="ti ti-folder" style="vertical-align:-2px"></i> Rebaños cerrados — su historia queda guardada aquí</div>';
  if(!cer.length)h+='<div style="color:var(--soft);font-size:13px">No hay rebaños cerrados todavía.</div>';
  cer.forEach(function(r){h+=cardRebano(r,true);});
  stage.innerHTML=h;bindCards();
@@ -163,7 +161,7 @@ function resumen(r){
 function sanidad(r){
  var evs=r.ev.filter(function(e){return SANIDAD.indexOf(e.t)>=0;}).sort(byF).reverse();
  var h='<div class="row" style="margin-bottom:8px"><h3 style="margin:0">Dosis, desparasitaciones y vacunas</h3><span class="add" id="adds"><i class="ti ti-plus" style="vertical-align:-2px"></i></span></div>';
- if(!evs.length)h+='<div style="color:var(--soft);font-size:13px">Sin registros. Tocá + para agregar.</div>';
+ if(!evs.length)h+='<div style="color:var(--soft);font-size:13px">Sin registros. Toca + para agregar.</div>';
  evs.forEach(function(e){var oi=r.ev.indexOf(e);h+='<div class="card lst ev" data-ei="'+oi+'" style="cursor:pointer"><div><div style="font-size:14px;font-weight:600">'+esc(e.prod||e.t)+'</div><div style="font-size:12px;color:var(--mut);margin-top:2px">'+chip(e.t,TIPO[e.t])+' '+(e.ml?"· "+esc(e.ml):"")+'</div>'+(e.x?'<div style="font-size:12px;color:var(--soft);margin-top:3px">'+esc(e.x)+'</div>':'')+'</div><div style="font-size:11px;color:var(--soft);white-space:nowrap">'+fmt(e.f)+'</div></div>';});
  return h;
 }
@@ -171,7 +169,7 @@ function repro(r){
  var enc=last(r,"Encaste"),sen=last(r,"Señalada"),par=paricion(r);
  var h='<div class="card"><div class="row"><h3 style="margin:0">Encaste</h3><span class="add" id="addenc">'+(enc?"editar":"+ agregar")+'</span></div>';
  if(enc)h+='<div style="margin-top:6px"><b style="font-size:20px;color:var(--acc)">'+enc.ovejas+'</b> ovejas · <b>'+enc.carneros+'</b> carneros<div style="font-size:12px;color:var(--mut);margin-top:3px">1 carnero cada '+(enc.carneros?Math.round(enc.ovejas/enc.carneros):"—")+' ovejas · '+fmt(enc.f)+'</div></div>';
- else h+='<div style="color:var(--soft);font-size:13px;margin-top:6px">Registrá ovejas encastadas y carneros.</div>';
+ else h+='<div style="color:var(--soft);font-size:13px;margin-top:6px">Registra las ovejas encastadas y los carneros.</div>';
  h+='</div><div class="card"><div class="row"><h3 style="margin:0">Señalada (corderos)</h3><span class="add" id="addsen">'+(sen?"editar":"+ agregar")+'</span></div>';
  if(sen)h+='<div style="margin-top:6px"><b style="font-size:20px;color:var(--acc)">'+sen.corderos+'</b> corderos señalados<div style="font-size:12px;color:var(--mut);margin-top:3px">'+fmt(sen.f)+'</div></div>';
  else h+='<div style="color:var(--soft);font-size:13px;margin-top:6px">Total de corderos obtenidos del lote.</div>';
@@ -211,17 +209,29 @@ function bind(r){
  var rp=document.getElementById("repartir");if(rp)rp.onclick=function(){splitModal(r,false);};
  var rb=document.getElementById("reabrir");if(rb)rb.onclick=function(){r.estado="activo";save();draw();};
  var rn=document.getElementById("renom");if(rn)rn.onclick=function(){renomModal(r);};
- var bo=document.getElementById("borrar");if(bo)bo.onclick=function(){if(confirm("¿Borrar definitivamente este rebaño y toda su historia? Solo para errores de carga. Para disolver conservando la historia, usá 'Cerrar y archivar'."))
+ var bo=document.getElementById("borrar");if(bo)bo.onclick=function(){if(confirm("¿Borrar definitivamente este rebaño y toda su historia? Solo para errores de carga. Para disolver conservando la historia, usa 'Cerrar y archivar'."))
    {S.rebanos=S.rebanos.filter(function(x){return x!==r;});save();history.back();}};
 }
-function renomModal(r){sheet('<h3>Renombrar rebaño</h3><label>Nuevo nombre</label><input id="rnn" value="'+esc(r.id)+'"><div style="font-size:11px;color:var(--soft);margin-top:6px">Podés repetir un nombre ya usado; el sistema los distingue igual por dentro.</div><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rnok">Guardar</button></div>');document.getElementById("rnok").onclick=function(){var v=document.getElementById("rnn").value.trim();if(v)r.id=v;save();close();draw();};}
+function renomModal(r){sheet('<h3>Renombrar rebaño</h3><label>Nuevo nombre</label><input id="rnn" value="'+esc(r.id)+'"><div style="font-size:11px;color:var(--soft);margin-top:6px">Puedes repetir un nombre ya usado; el sistema los distingue igual internamente.</div><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rnok">Guardar</button></div>');document.getElementById("rnok").onclick=function(){var v=document.getElementById("rnn").value.trim();if(v)r.id=v;save();close();draw();};}
+/* ------ Selector de potreros (chips) ------ */
+function renderPotPicker(cid,arr){
+ var el=document.getElementById(cid);if(!el)return;
+ var avail=POTREROS.filter(function(p){return arr.indexOf(p)<0;});
+ var h='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px">'+(arr.length?arr.map(function(p,i){return '<span class="chip" style="background:#EAF3DE;color:#27500A">'+esc(p)+' <span class="pp-rm" data-i="'+i+'" style="cursor:pointer;font-weight:700">×</span></span>';}).join(""):'<span style="font-size:12px;color:var(--soft)">Sin potreros seleccionados</span>')+'</div>';
+ h+='<select class="pp-sel"><option value="">＋ Agregar potrero…</option>'+avail.map(function(p){return '<option>'+esc(p)+'</option>';}).join("")+'<option value="__otro__">Otro (escribir)…</option></select>';
+ h+='<div class="pp-otro" style="display:none;margin-top:6px"><div style="display:flex;gap:6px"><input class="pp-txt" placeholder="Nombre del potrero"><button type="button" class="pp-add" style="width:84px">Agregar</button></div></div>';
+ el.innerHTML=h;
+ [].forEach.call(el.querySelectorAll(".pp-rm"),function(x){x.onclick=function(){arr.splice(+x.getAttribute("data-i"),1);renderPotPicker(cid,arr);};});
+ var s=el.querySelector(".pp-sel");s.onchange=function(){if(s.value=="__otro__"){el.querySelector(".pp-otro").style.display="block";s.value="";}else if(s.value){arr.push(s.value);renderPotPicker(cid,arr);}};
+ var add=el.querySelector(".pp-add");if(add)add.onclick=function(){var t=el.querySelector(".pp-txt").value.trim();if(t&&arr.indexOf(t)<0)arr.push(t);renderPotPicker(cid,arr);};
+}
 var calLote="",calFiltro="";
 function cal(){
  var h='<div style="display:flex;gap:8px;margin-bottom:12px"><select id="cl" style="flex:1"><option value="">Todos los rebaños</option>'+S.rebanos.map(function(r){return '<option value="'+r.uid+'"'+(calLote==r.uid?" selected":"")+'>'+esc(r.id)+'</option>';}).join("")+'</select><select id="cf" style="flex:1"><option value="">Todo evento</option>'+TIPOS.concat(["Encaste"]).filter(function(v,i,a){return a.indexOf(v)==i;}).map(function(k){return '<option'+(calFiltro==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select></div>';
  h+='<div class="row" style="margin-bottom:8px"><span class="sec-h" style="margin:0">Faenas 2026</span><span class="add" id="addfa"><i class="ti ti-plus" style="vertical-align:-2px"></i> agregar</span></div>';
  var fs=S.faenas.filter(function(f){return (!calLote||f.lote==calLote)&&(!calFiltro||f.k==calFiltro);}).sort(byFecha);
  if(!fs.length)h+='<div style="color:var(--soft);font-size:13px">Sin faenas para este filtro.</div>';
- fs.forEach(function(f,idx){var p=TIPO[f.k];h+='<div class="card lst fa" data-i="'+S.faenas.indexOf(f)+'" style="cursor:pointer"><div><div style="font-size:14px;font-weight:600">'+esc(f.t)+'</div><div style="margin-top:4px">'+chip(f.k,p)+(f.lote?' '+chip(nameOf(f.lote),["#EAF3DE","#27500A"]):' '+chip("General",["#F1EFE8","#444441"]))+'</div></div><div style="font-size:14px;font-weight:600;color:var(--acc);white-space:nowrap">'+fmt(f.fecha)+'</div></div>';});
+ fs.forEach(function(f){var p=TIPO[f.k];h+='<div class="card lst fa" data-i="'+S.faenas.indexOf(f)+'" style="cursor:pointer"><div><div style="font-size:14px;font-weight:600">'+esc(f.t)+'</div><div style="margin-top:4px">'+chip(f.k,p)+(f.lote?' '+chip(nameOf(f.lote),["#EAF3DE","#27500A"]):' '+chip("General",["#F1EFE8","#444441"]))+'</div></div><div style="font-size:14px;font-weight:600;color:var(--acc);white-space:nowrap">'+fmt(f.fecha)+'</div></div>';});
  stage.innerHTML=h;
  document.getElementById("cl").onchange=function(){calLote=this.value;draw();};
  document.getElementById("cf").onchange=function(){calFiltro=this.value;draw();};
@@ -241,7 +251,7 @@ function close(){modal.innerHTML="";}
 function fieldModal(){sheet('<h3>Nuevo indicador o comentario</h3><label>Nombre</label><input id="fk" placeholder="Ej: Condición corporal"><label>Valor</label><input id="fv" placeholder="Ej: Buena, texto libre"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="fs">Agregar</button></div>');document.getElementById("fs").onclick=function(){var k=document.getElementById("fk").value.trim();if(!k)return;sel.campos.push([k,document.getElementById("fv").value.trim()]);save();close();draw();};}
 function splitModal(r,cerrar){
  var total=cant(r);var rows=[{dest:"",n:"",name:"",pot:""}];
- function optsFor(sel){var h='<option value="">— Destino —</option>';activos().forEach(function(x){if(x.uid!=r.uid)h+='<option value="'+x.uid+'"'+(sel==x.uid?" selected":"")+'>'+esc(x.id)+(x.cat?" ("+x.cat+")":"")+'</option>';});h+='<option value="__new__"'+(sel=="__new__"?" selected":"")+'>➕ Crear lote nuevo</option><option value="__venta__"'+(sel=="__venta__"?" selected":"")+'>Vendidos</option><option value="__baja__"'+(sel=="__baja__"?" selected":"")+'>Baja / muertos</option>';return h;}
+ function optsFor(sel){var h='<option value="">— Destino —</option>';activos().forEach(function(x){if(x.uid!=r.uid)h+='<option value="'+x.uid+'"'+(sel==x.uid?" selected":"")+'>'+esc(x.id)+'</option>';});h+='<option value="__new__"'+(sel=="__new__"?" selected":"")+'>➕ Crear lote nuevo</option><option value="__venta__"'+(sel=="__venta__"?" selected":"")+'>Vendidos</option><option value="__baja__"'+(sel=="__baja__"?" selected":"")+'>Baja / muertos</option>';return h;}
  function asignado(){return rows.reduce(function(s,x){return s+(+x.n||0);},0);}
  function render(){
   var rem=total-asignado();
@@ -249,7 +259,7 @@ function splitModal(r,cerrar){
   b+='<div style="font-size:13px;color:var(--mut);margin-bottom:8px">Total: <b>'+total+'</b> · Sin asignar: <b id="d-rem" style="color:'+(rem<0?"var(--bad)":"var(--acc)")+'">'+rem+'</b></div>';
   rows.forEach(function(x,i){
    b+='<div style="border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px"><div style="display:flex;gap:8px"><select class="d-dest" data-i="'+i+'" style="flex:1">'+optsFor(x.dest)+'</select><input class="d-n" data-i="'+i+'" type="number" placeholder="cant." value="'+x.n+'" style="width:82px">'+(rows.length>1?'<button class="ghost d-rm" data-i="'+i+'" style="width:38px;padding:6px;color:var(--bad)">×</button>':'')+'</div>';
-   if(x.dest=="__new__")b+='<input class="d-name" data-i="'+i+'" placeholder="Nombre del lote nuevo" value="'+esc(x.name)+'" style="margin-top:8px"><input class="d-pot" data-i="'+i+'" list="pots" placeholder="Potrero (opcional)" value="'+esc(x.pot)+'" style="margin-top:6px">';
+   if(x.dest=="__new__")b+='<input class="d-name" data-i="'+i+'" placeholder="Nombre del lote nuevo" value="'+esc(x.name)+'" style="margin-top:8px"><input class="d-pot" data-i="'+i+'" placeholder="Potrero (opcional)" value="'+esc(x.pot)+'" style="margin-top:6px">';
    b+='</div>';
   });
   b+='<div class="add" id="d-add" style="margin:2px 0 12px;display:inline-block"><i class="ti ti-plus" style="vertical-align:-2px"></i> Agregar destino</div>';
@@ -263,8 +273,8 @@ function splitModal(r,cerrar){
   document.getElementById("d-add").onclick=function(){rows.push({dest:"",n:"",name:"",pot:""});render();};
   document.getElementById("d-ok").onclick=function(){
    var asig=asignado();
-   if(cerrar&&asig!=total){alert("Para cerrar tenés que asignar los "+total+" animales. Ahora "+(asig<total?"faltan "+(total-asig):"sobran "+(asig-total))+".");return;}
-   if(!cerrar&&asig>total){alert("No podés mover más de "+total+" animales.");return;}
+   if(cerrar&&asig!=total){alert("Para cerrar tienes que asignar los "+total+" animales. Ahora "+(asig<total?"faltan "+(total-asig):"sobran "+(asig-total))+".");return;}
+   if(!cerrar&&asig>total){alert("No puedes mover más de "+total+" animales.");return;}
    var hoy=new Date().toISOString().slice(0,10);
    rows.forEach(function(x){var n=+x.n||0;if(n<=0||!x.dest)return;
     if(x.dest=="__venta__")r.ev.push({f:hoy,t:"Venta",n:n,x:cerrar?"Cierre del rebaño":"Reparto"});
@@ -282,20 +292,22 @@ function faenaModal(fi){var f=fi!=null?S.faenas[fi]:null;var ks=TIPOS.concat(["E
  var d=document.getElementById("fdel");if(d)d.onclick=function(){S.faenas.splice(fi,1);save();close();draw();};}
 function evModal(ei,forceT){
  var e=ei!=null?sel.ev[ei]:{f:new Date().toISOString().slice(0,10),t:forceT||"Conteo"};var t=e.t;var tmp={foto:e.foto};
+ var movPot=(e.potreros||sel.potreros||[]).slice();
  var opts=TIPOS.slice();if(opts.indexOf(t)<0)opts.push(t);
  var otros=S.rebanos.filter(function(x){return x.uid!=sel.uid;});
  function fields(tp){var h="";
   if(tp=="Conteo"||tp=="Muerte"||tp=="Venta"||tp=="Compra")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'">';
-  else if(tp=="Traspaso")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'"><label>Rebaño destino</label><select id="v_dest">'+otros.map(function(x){return '<option value="'+x.uid+'"'+(e.destino==x.uid?" selected":"")+'>'+esc(x.id)+(x.cat?" ("+x.cat+")":"")+'</option>';}).join("")+'</select>';
+  else if(tp=="Traspaso")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'"><label>Rebaño destino</label><select id="v_dest">'+otros.map(function(x){return '<option value="'+x.uid+'"'+(e.destino==x.uid?" selected":"")+'>'+esc(x.id)+'</option>';}).join("")+'</select>';
   else if(SANIDAD.indexOf(tp)>=0)h+='<label>Producto</label><input id="v_prod" list="prods" value="'+esc(e.prod||"")+'"><label>Dosis / ml</label><input id="v_ml" placeholder="Ej: 1 ml, 2 ml SC" value="'+esc(e.ml||"")+'">';
   else if(tp=="Encaste")h+='<label>Ovejas encastadas</label><input id="v_ov" type="number" value="'+(e.ovejas||"")+'"><label>Carneros</label><input id="v_ca" type="number" value="'+(e.carneros||"")+'">';
   else if(tp=="Señalada")h+='<label>Corderos señalados (total del lote)</label><input id="v_co" type="number" value="'+(e.corderos||"")+'">';
   else if(tp=="Esquila")h+='<label>Tipo de esquila</label><select id="v_et"><option'+(e.etipo=="Completa"?" selected":"")+'>Completa</option><option'+(e.etipo=="Ojos-entrepierna"?" selected":"")+'>Ojos-entrepierna</option></select>';
-  else if(tp=="Movimiento")h+='<label>Potrero(s) — separá con coma</label><input id="v_pot" list="pots" value="'+esc((e.potreros||sel.potreros).join(", "))+'">';
+  else if(tp=="Movimiento")h+='<label>Potreros (uno o varios)</label><div id="mov-pick"></div>';
   else if(tp=="Ingreso")h+='<label>Cantidad</label><input id="v_n" type="number" value="'+(e.n||"")+'">';
   return h;}
  sheet('<datalist id="prods">'+PRODUCTOS.map(function(p){return '<option value="'+p+'">';}).join("")+'</datalist><h3>'+(ei!=null?"Editar evento":"Nuevo evento")+'</h3><label>Fecha</label><input id="v_f" type="date" value="'+(e.f||"")+'"><label>Tipo</label><select id="v_t">'+opts.map(function(k){return '<option'+(t==k?" selected":"")+'>'+k+'</option>';}).join("")+'</select><div id="dyn">'+fields(t)+'</div><label>Comentario</label><textarea id="v_x" rows="2">'+esc(e.x||"")+'</textarea><label>Foto</label><button class="ghost" id="v_p"><i class="ti ti-camera" style="vertical-align:-2px"></i> '+(e.foto?"Cambiar":"Agregar")+'</button><div id="v_pv">'+(e.foto?'<img class="ph" src="'+e.foto+'">':'')+'</div>'+(t=="Traspaso"?'<div style="font-size:11px;color:var(--soft);margin-top:6px">Al guardar, el rebaño destino recibe estos animales automáticamente.</div>':'')+'<div style="display:flex;gap:8px;margin-top:14px">'+(ei!=null?'<button class="ghost" id="v_d" style="flex:0 0 46px;color:var(--bad)"><i class="ti ti-trash"></i></button>':'')+'<button class="ghost" onclick="close()">Cancelar</button><button id="v_s">Guardar</button></div>');
- document.getElementById("v_t").onchange=function(){document.getElementById("dyn").innerHTML=fields(this.value);};
+ if(t=="Movimiento")renderPotPicker("mov-pick",movPot);
+ document.getElementById("v_t").onchange=function(){document.getElementById("dyn").innerHTML=fields(this.value);if(this.value=="Movimiento")renderPotPicker("mov-pick",movPot);};
  document.getElementById("v_p").onclick=function(){pick(function(d){tmp.foto=d;document.getElementById("v_pv").innerHTML='<img class="ph" src="'+d+'">';});};
  document.getElementById("v_s").onclick=function(){var tp=document.getElementById("v_t").value;var o={f:document.getElementById("v_f").value,t:tp,x:document.getElementById("v_x").value.trim(),foto:tmp.foto};function g(id){var el=document.getElementById(id);return el?el.value:"";}
   if(tp=="Conteo"||tp=="Muerte"||tp=="Venta"||tp=="Compra"||tp=="Traspaso"||tp=="Ingreso")o.n=+g("v_n")||0;
@@ -304,17 +316,19 @@ function evModal(ei,forceT){
   if(tp=="Encaste"){o.ovejas=+g("v_ov")||0;o.carneros=+g("v_ca")||0;}
   if(tp=="Señalada")o.corderos=+g("v_co")||0;
   if(tp=="Esquila")o.etipo=g("v_et");
-  if(tp=="Movimiento"){o.potreros=g("v_pot").split(",").map(function(s){return s.trim();}).filter(Boolean);sel.potreros=o.potreros.slice();}
-  if(ei!=null){o.foto=o.foto;sel.ev[ei]=o;}else sel.ev.push(o);save();close();draw();};
+  if(tp=="Movimiento"){o.potreros=movPot.slice();sel.potreros=movPot.slice();}
+  if(ei!=null)sel.ev[ei]=o;else sel.ev.push(o);save();close();draw();};
  var d=document.getElementById("v_d");if(d)d.onclick=function(){sel.ev.splice(ei,1);save();close();draw();};
 }
 function pick(cb){var inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.onchange=function(){var f=inp.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var img=new Image();img.onload=function(){var mx=680,s=Math.min(1,mx/Math.max(img.width,img.height));var cv=document.createElement("canvas");cv.width=img.width*s;cv.height=img.height*s;cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);cb(cv.toDataURL("image/jpeg",0.6));};img.src=rd.result;};rd.readAsDataURL(f);};inp.click();}
 function fabber(){fab.innerHTML=view=="rebanos"?'<button id="fabr"><i class="ti ti-plus" style="vertical-align:-2px"></i> Rebaño</button>':(view=="rebano"&&sel.estado!="cerrado"?'<button id="fabe"><i class="ti ti-plus" style="vertical-align:-2px"></i> Evento</button>':"");var b=document.getElementById("fabr");if(b)b.onclick=rebModal;var e=document.getElementById("fabe");if(e)e.onclick=function(){evModal();};}
-function rebModal(){var otros=activos();sheet('<h3>Nuevo rebaño</h3><label>Nombre / ID</label><input id="ri" placeholder="Ej: L8"><label>Categoría (opcional)</label><select id="rc"><option value="">— Sin categoría —</option>'+Object.keys(CAT).map(function(c){return '<option>'+c+'</option>';}).join("")+'</select><label>Potrero(s) — separá con coma</label><input id="rp" list="pots" placeholder="Ej: El consumo"><label>Origen (de dónde viene)</label><select id="ro"><option value="conteo">Conteo inicial</option><option value="compra">Compra</option>'+otros.map(function(x){return '<option value="from:'+x.uid+'">Desde '+esc(x.id)+'</option>';}).join("")+'</select><label>Cantidad</label><input id="rn" type="number" value="0"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rs">Crear</button></div>');
- document.getElementById("rs").onclick=function(){var id=document.getElementById("ri").value.trim()||"Nuevo";var n=+document.getElementById("rn").value||0;var pot=document.getElementById("rp").value.split(",").map(function(s){return s.trim();}).filter(Boolean);var org=document.getElementById("ro").value;var hoy=new Date().toISOString().slice(0,10);var u=newUid();var ev=[];
+function rebModal(){var otros=activos();var potArr=[];
+ sheet('<h3>Nuevo rebaño</h3><label>Nombre / ID</label><input id="ri" placeholder="Ej: L8"><label>Categoría (opcional)</label><select id="rc"><option value="">— Sin categoría —</option>'+Object.keys(CAT).map(function(c){return '<option>'+c+'</option>';}).join("")+'</select><label>Potreros (uno o varios)</label><div id="pp1"></div><label>Origen (de dónde viene)</label><select id="ro"><option value="conteo">Conteo inicial</option><option value="compra">Compra</option>'+otros.map(function(x){return '<option value="from:'+x.uid+'">Desde '+esc(x.id)+'</option>';}).join("")+'</select><label>Cantidad</label><input id="rn" type="number" value="0"><div style="display:flex;gap:8px;margin-top:14px"><button class="ghost" onclick="close()">Cancelar</button><button id="rs">Crear</button></div>');
+ renderPotPicker("pp1",potArr);
+ document.getElementById("rs").onclick=function(){var id=document.getElementById("ri").value.trim()||"Nuevo";var n=+document.getElementById("rn").value||0;var org=document.getElementById("ro").value;var hoy=new Date().toISOString().slice(0,10);var u=newUid();var ev=[];
   if(n){if(org.indexOf("from:")==0){var src=org.slice(5);ev.push({f:hoy,t:"Ingreso",n:n,origen:src,x:"Desde "+nameOf(src)});var s=rebByUid(src);if(s)s.ev.push({f:hoy,t:"Traspaso",n:n,destino:u,x:"Formación de "+id});}
    else ev.push({f:hoy,t:"Conteo",n:n,x:org=="compra"?"Compra":"Conteo inicial"});}
-  S.rebanos.push({uid:u,id:id,cat:document.getElementById("rc").value,estado:"activo",potreros:pot.length?pot:["—"],campos:[],ev:ev});save();close();draw();};
+  S.rebanos.push({uid:u,id:id,cat:document.getElementById("rc").value,estado:"activo",potreros:potArr.length?potArr.slice():["—"],campos:[],ev:ev});save();close();draw();};
 }
 function navbar(){var T=[["rebanos","ti-layout-grid","Rebaños"],["calendario","ti-calendar","Calendario"],["campo","ti-timeline","Campo"]];nav.innerHTML=T.map(function(t){var on=view==t[0]||((view=="rebano"||view=="archivo")&&t[0]=="rebanos");return '<div class="tb '+(on?"on":"")+'" data-v="'+t[0]+'"><i class="ti '+t[1]+'"></i><div>'+t[2]+'</div></div>';}).join("");[].forEach.call(document.querySelectorAll(".tb"),function(el){el.onclick=function(){var v=el.getAttribute("data-v");if(v!=view){sel=null;nav2(v,"fade");}};});}
 draw();
